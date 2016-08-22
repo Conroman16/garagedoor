@@ -8,6 +8,17 @@ var gpio = require('rpi-gpio'),
 	swig = require('swig'),
 	gpioIsInitialized = false,
 	GarageDoor = {
+
+		POSITION_SENSOR_GPIO_PIN: 11,	// Physical pin number
+		OPENER_RELAY_GPIO_PIN: 13,		// Physical pin number
+		DOOR_TOGGLE_TIME: 500, 			// Milliseconds
+
+		initialize: function(){
+			this.gpio.initialize();
+			this.server.initialize();
+			this.sockets.initialize();
+		},
+
 		events: {
 			doorOpen: function(){
 				io.emit('dooropen')
@@ -19,6 +30,11 @@ var gpio = require('rpi-gpio'),
 			}
 		},
 		gpio: {
+			initialize: function(){
+				gpio.setup(GarageDoor.POSITION_SENSOR_GPIO_PIN, gpio.DIR_IN, gpio.EDGE_BOTH);
+				gpio.setup(GarageDoor.OPENER_RELAY_GPIO_PIN, gpio.DIR_OUT);
+				gpio.on('change', this.onChange);
+			},
 			onChange: debounce(function(channel, value){
 				value = !value;
 				switch (channel){
@@ -31,38 +47,62 @@ var gpio = require('rpi-gpio'),
 						}
 						break;
 				}
-			}, 100)
+			}, 100),
+			toggleDoor: function(){
+				gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 1, function(err){
+					if (err){
+						console.log('ERROR: ' + err);
+						throw err;
+					}
+
+					console.log('Toggling door state');
+					setTimeout(function(){
+						gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 0, function(err){
+							if (err){
+								console.log('ERROR: ' + err);
+								throw err;
+							}
+
+							console.log('Door state toggled successfully');
+						});
+					}, 500);
+				});
+			}
+		},
+		sockets: {
+			initialize: function(){
+				this.setupEvents();
+			},
+			setupEvents: function(){
+				io.on('connection', function(socket) {
+					console.log('Socket connected');
+
+					socket.on('toggledoorstate', function(data){
+						GarageDoor.gpio.toggleDoor();
+					});
+				});
+			}
+		},
+		server: {
+			initialize: function(){
+				app.engine('swig', swig.renderFile);
+				app.set('view engine', 'swig');
+				app.set('views', path.join(__dirname, 'src', 'views'));
+
+				app.use('/static', express.static(path.join(__dirname, 'src', 'static')));
+
+				app.get('/', function(req, res){
+					res.render('index', {DoorIsOpen: false});
+				});
+
+				http.listen(1693, function(){
+					console.log('Application started on *:1693');
+				});
+			}
 		}
 	};
 
-app.engine('swig', swig.renderFile);
-app.set('view engine', 'swig');
-app.set('views', path.join(__dirname, 'src', 'views'));
-
-app.use('/static', express.static(path.join(__dirname, 'src', 'static')));
-
-app.get('/', function(req, res){
-	res.render('index', {DoorIsOpen: false});
-});
-
-io.on('connection', function(socket) {
-	console.log('Socket connected');
-	
-	socket.on('test', function (data) {
-		console.log(data);
-	});
-});
-
-io.on('disconnect', function(socket){
-	console.log('Socket disconnected');
-});
-
-http.listen(1693, function(){
-	console.log('Application started on *:1693');
-});
-
-gpio.setup(11, gpio.DIR_IN, gpio.EDGE_BOTH);
-gpio.on('change', GarageDoor.gpio.onChange);
+GarageDoor.initialize();
 
 // process.on('SIGINT', function(){
 // 	if (gpioIsInitialized){

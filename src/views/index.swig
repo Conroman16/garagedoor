@@ -5,12 +5,16 @@
 	<div class="led"></div>
 	<div class="status-message"></div>
 </div>
+<div>
+	<button class='toggle-door-state'>Toggle Door State</button>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-	var socket = io.connect();
 	$(function(){
+		var socket = io.connect();
+		
 		function setDoorOpen(){
 			$status.text('Door is open');
 			$led.removeClass('green');
@@ -21,9 +25,17 @@
 			$led.removeClass('red');
 			$led.addClass('green');
 		}
+		function toggleDoorState(){
+			socket.emit('toggledoorstate');
+		}
 
 		var $status = $('.status-wrap .status-message'),
-		$led = $('.status-wrap .led');
+			$led = $('.status-wrap .led'),
+			$doorToggle = $('.toggle-door-state');
+
+			$doorToggle.click(function(){
+				toggleDoorState();
+			});
 
 		if (GarageDoor.server.doorIsOpen)
 			setDoorOpen();
