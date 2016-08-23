@@ -1,5 +1,5 @@
 # Compiled SCSS
-src/static/css/**/*
+src/static/css/**
 
 # Logs
 logs
