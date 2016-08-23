@@ -2,10 +2,13 @@
 <html>
 <head>
 	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" >
+	
 	<title>Garage Door</title>
 
 	<link rel="icon" href="/static/img/favicon.ico" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
+	<link rel="stylesheet" href="/static/css/simplegrid.css" />
 	<link rel="stylesheet" href="/static/css/style.css" />
 
 	{% block style %}{% endblock %}

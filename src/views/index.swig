@@ -1,12 +1,20 @@
 {% extends 'shared/layout.swig' %}
 
 {% block body %}
-<div class="status-wrap">
-	<div class="led"></div>
-	<div class="status-message"></div>
-</div>
-<div>
-	<button class='toggle-door-state'>Toggle Door State</button>
+<div class="page">
+	<div class="grid grid-pad">
+		<div class="col-1-1">
+			<div class="content center">
+				<div class="status-wrap">
+					<div class="status-led led"></div>
+					<div class="status-message"></div>
+				</div>
+				<div class="door-toggle">
+					<button class="button toggle-door-state">Toggle Door State</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 
@@ -35,6 +43,9 @@
 
 			$doorToggle.click(function(){
 				toggleDoorState();
+				setTimeout(function(){
+					$doorToggle.trigger('mouseout');
+				}, 2000);
 			});
 
 		if (GarageDoor.server.doorIsOpen)

@@ -12,13 +12,14 @@ var GarageDoor = {
 	POSITION_SENSOR_GPIO_PIN: 11,	// Physical pin number
 	OPENER_RELAY_GPIO_PIN: 13,		// Physical pin number
 	DOOR_TOGGLE_TIME: 500, 			// Milliseconds
+	BASE_PATH: __dirname,
 	VIEWS_PATH: path.join(__dirname, 'src', 'views'),
 	STATIC_FILES_PATH: path.join(__dirname, 'src', 'static'),
 	LIB_PATH: path.join(__dirname, 'src', 'lib'),
 	GPIO_IS_INITIALIZED: false,
 
 	initialize: function(){
-		require(this.LIB_PATH + '/gpio.js')(this, gpio, debounce);
+		require(this.LIB_PATH + '/gpio.js')(this, gpio, io, debounce);
 		require(this.LIB_PATH + '/server.js')(this, http, express, app, swig);
 		require(this.LIB_PATH + '/sockets.js')(this, io);
 
@@ -47,6 +48,7 @@ var GarageDoor = {
 	}
 };
 
+// Start
 GarageDoor.initialize();
 
 process.on('SIGINT', GarageDoor.events.processExit);
