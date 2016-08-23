@@ -1,6 +1,4 @@
-@import 'https://fonts.googleapis.com/css?family=Raleway';
-@import 'simplegrid.css';
-
+// Variables
 $greenStartColor: #17d766;
 $greenEndColor: #16cf62;
 $redStartColor: #f23311;
@@ -10,21 +8,16 @@ $buttonBackgroundColor: #fff;
 $buttonHoverColor: #eee;
 $buttonActiveColor: #ddd;
 
-@mixin radialGradient ($startColor, $endColor){
-  background: $startColor;
-  background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
-  background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
-  background: radial-gradient(ellipse at center, $startColor 0%, $endColor 100%);
-}
-@mixin ledGradient ($startColor, $endColor){
-  @include radialGradient($startColor, $endColor);
-  opacity: 0.8;
-  filter:alpha(opacity=80);
-}
+// Imports
+@import 'https://fonts.googleapis.com/css?family=Raleway';
+@import 'simplegrid.css';
+@import 'mixins.scss';
 
+// Style
 .page{
   font-family: 'Raleway';
-  
+  margin-top: 2em;
+
   .status-led{
     width: 125px;
     height: 125px;
@@ -35,7 +28,7 @@ $buttonActiveColor: #ddd;
   }
 }
 
-/* Utility */
+// Utility
 .button{
   border: 2px solid $buttonBorderColor;
   border-radius: 6px;

@@ -1,7 +1,15 @@
 module.exports = function(GarageDoor, path, http, express, app, sass, swig){
 	Object.assign(GarageDoor, {
 		server: {
+			defaults: {
+				port: 80
+			},
 			initialize: function(){
+				this.startServer();
+			},
+			startServer: function(){
+				var self = this;
+
 				app.engine('swig', swig.renderFile);
 				app.set('view engine', 'swig');
 				app.set('views', GarageDoor.VIEWS_PATH);
@@ -9,7 +17,6 @@ module.exports = function(GarageDoor, path, http, express, app, sass, swig){
 				app.use(sass({
 					src: path.join(GarageDoor.STATIC_FILES_PATH, 'style'),
 					dest: path.join(GarageDoor.STATIC_FILES_PATH, 'css'),
-					debug: true,
 					outputStyle: 'compressed',
 					prefix: '/static/css'
 				}));
@@ -28,8 +35,8 @@ module.exports = function(GarageDoor, path, http, express, app, sass, swig){
 					});
 				});
 
-				http.listen(1693, function(){
-					console.log('Application started on *:1693');
+				http.listen(this.defaults.port, function(){
+					console.log(`Application started on *:${self.defaults.port}`);
 				});
 			}
 		}

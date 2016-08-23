@@ -6,8 +6,8 @@ module.exports = function(GarageDoor, io){
 			},
 			setupEvents: function(){
 				io.on('connection', function(socket) {
-					console.log('Socket connected');
-
+					console.log(`Socket connected [${socket.handshake.address}]`);
+					
 					socket.on('toggledoorstate', function(data){
 						GarageDoor.gpio.toggleDoor();
 					});

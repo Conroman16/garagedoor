@@ -1,0 +1,11 @@
+@mixin radialGradient ($startColor, $endColor){
+  background: $startColor;
+  background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+  background: radial-gradient(ellipse at center, $startColor 0%, $endColor 100%);
+}
+@mixin ledGradient ($startColor, $endColor){
+  @include radialGradient($startColor, $endColor);
+  opacity: 0.8;
+  filter:alpha(opacity=80);
+}
