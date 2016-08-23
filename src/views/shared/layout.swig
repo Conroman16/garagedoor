@@ -8,7 +8,6 @@
 
 	<link rel="icon" href="/static/img/favicon.ico" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
-	<link rel="stylesheet" href="/static/css/simplegrid.css" />
 	<link rel="stylesheet" href="/static/css/style.css" />
 
 	{% block style %}{% endblock %}

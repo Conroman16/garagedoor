@@ -1,0 +1,75 @@
+@import 'https://fonts.googleapis.com/css?family=Raleway';
+@import '/static/css/simplegrid.css';
+
+$greenStartColor: #17d766;
+$greenEndColor: #16cf62;
+$redStartColor: #f23311;
+$redEndColor: #e32c0c;
+$buttonBorderColor: #ccc;
+$buttonBackgroundColor: #fff;
+$buttonHoverColor: #eee;
+$buttonActiveColor: #ddd;
+
+@mixin radialGradient ($startColor, $endColor){
+  background: $startColor;
+  background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+  background: radial-gradient(ellipse at center, $startColor 0%, $endColor 100%);
+}
+@mixin ledGradient ($startColor, $endColor){
+  @include radialGradient($startColor, $endColor);
+  opacity: 0.8;
+  filter:alpha(opacity=80);
+}
+
+.page{
+  font-family: 'Raleway';
+  
+  .status-led{
+    width: 125px;
+    height: 125px;
+  }
+  .status-message{
+    font-size: 4em;
+    margin: 0.5em 0;
+  }
+}
+
+/* Utility */
+.button{
+  border: 2px solid $buttonBorderColor;
+  border-radius: 6px;
+  background-color: $buttonBackgroundColor;
+  font-family: 'Raleway';
+  padding: 1.25em;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  
+  &:hover{
+    background-color: $buttonHoverColor;
+  }
+  &:active{
+    background-color: $buttonActiveColor;
+  }
+}
+.center{
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.led {
+  border-radius: 100%;
+  display: inline-block;
+  
+  &.green{
+    @include ledGradient($greenStartColor, $greenEndColor);
+  }
+  &.red{
+    @include ledGradient($redStartColor, $redEndColor);
+  }
+}
+textarea,
+button,
+input {
+    outline:none;
+}

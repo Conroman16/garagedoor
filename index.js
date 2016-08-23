@@ -4,6 +4,7 @@ var gpio = require('rpi-gpio'),
 	express = require('express'),
 	app = express(),
 	http = require('http').Server(app),
+	sass = require('node-sass-middleware'),
 	io = require('socket.io')(http),
 	swig = require('swig');
 
@@ -20,7 +21,7 @@ var GarageDoor = {
 
 	initialize: function(){
 		require(this.LIB_PATH + '/gpio.js')(this, gpio, io, debounce);
-		require(this.LIB_PATH + '/server.js')(this, http, express, app, swig);
+		require(this.LIB_PATH + '/server.js')(this, path, http, express, app, sass, swig);
 		require(this.LIB_PATH + '/sockets.js')(this, io);
 
 		this.gpio.initialize();
