@@ -40,9 +40,9 @@ var GarageDoor = {
 			io.emit('doorclose');
 			console.log('Door closed');
 		},
-		processExit: function(){
+		processExit: function(event){
 			if (!!GarageDoor.GPIO_IS_INITIALIZED){
-				console.log('\nFreeing resources...');
+				console.log(`\n${event} received.  Freeing resources...`);
 				gpio.destroy(function(){
 					process.exit();
 				});
@@ -51,8 +51,12 @@ var GarageDoor = {
 	},
 
 	registerExitEvents: function(){
-		process.on('SIGINT', GarageDoor.events.processExit);
-		process.on('SIGTERM', GarageDoor.events.processExit);
+		process.on('SIGINT', function(){
+			GarageDoor.events.processExit('SIGINT');
+		});
+		process.on('SIGTERM', function(){
+			GarageDoor.events.processExit('SIGTERM');
+		});
 	}
 };
 
