@@ -20,9 +20,9 @@ var GarageDoor = {
 	GPIO_IS_INITIALIZED: false,
 
 	initialize: function(){
-		require(this.LIB_PATH + '/gpio.js')(this, gpio, io, debounce);
-		require(this.LIB_PATH + '/server.js')(this, path, http, express, app, sass, swig);
-		require(this.LIB_PATH + '/sockets.js')(this, io);
+		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio, io, debounce);
+		require(path.join(this.LIB_PATH, 'server.js'))(this, path, http, express, app, sass, swig);
+		require(path.join(this.LIB_PATH, 'sockets.js'))(this, io);
 
 		this.gpio.initialize();
 		this.server.initialize();

@@ -1,0 +1,30 @@
+// Variables
+$greenStartColor: #50db88;
+$greenEndColor: #16cf62;
+$redStartColor: #f4573b;
+$redEndColor: #e32c0c;
+$buttonBorderColor: #ccc;
+$buttonBackgroundColor: #fff;
+$buttonHoverColor: #eee;
+$buttonActiveColor: #ddd;
+
+// Imports
+@import 'https://fonts.googleapis.com/css?family=Raleway';
+@import 'simplegrid.css';
+@import 'mixins.scss';
+@import 'utility.scss';
+
+// Style
+.page{
+  font-family: 'Raleway';
+  transition: opacity 0.2s;
+
+  .status-led{
+    width: 125px;
+    height: 125px;
+  }
+  .status-message{
+    font-size: 4em;
+    margin: 0.25em 0 0.5em;
+  }
+}
