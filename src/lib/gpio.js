@@ -1,5 +1,7 @@
 module.exports = function(GarageDoor, gpio, io, debounce){
 
+	// The way the circuit is wired, a value of '1' or 'true' indicates that
+	// the door is closed and a value of '0' or 'false' indicates it's open
 	Object.assign(GarageDoor, {
 		gpio: {
 			initialize: function(){
@@ -22,6 +24,16 @@ module.exports = function(GarageDoor, gpio, io, debounce){
 						break;
 				}
 			}, 100),
+			doorIsOpen: function(callback){
+				gpio.read(GarageDoor.POSITION_SENSOR_GPIO_PIN, function(err, value){
+					if (err){
+						console.log(`ERROR: ${err}`);
+						throw err;
+					}
+
+					callback(!value);
+				});
+			},
 			toggleDoor: function(){
 				gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 1, function(err){
 					if (err){

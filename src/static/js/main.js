@@ -25,7 +25,6 @@ $(function(){
 		}
 	});
 
-	alert(GarageDoor.server.doorIsOpen.toString());
 	if (GarageDoor.server.doorIsOpen)
 		GarageDoor.events.doorOpen();
 	else

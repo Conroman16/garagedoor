@@ -24,7 +24,9 @@ module.exports = function(GarageDoor, path, http, express, app, sass, swig){
 				app.use('/static', express.static(GarageDoor.STATIC_FILES_PATH));
 
 				app.get('/', function(req, res){
-					res.render('index', {DoorIsOpen: false});
+					GarageDoor.gpio.doorIsOpen(function(value){
+						res.render('index', { DoorIsOpen: value });
+					});
 				});
 
 				app.get('/license', function(req, res){
