@@ -1,5 +1,5 @@
 // Gradients
-@mixin radialGradient ($startColor, $endColor){
+@mixin radial-gradient ($startColor, $endColor){
   background: $startColor;
   background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
   background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
@@ -7,7 +7,15 @@
 }
 
 @mixin led ($startColor, $endColor){
-  @include radialGradient($startColor, $endColor);
+  @include radial-gradient($startColor, $endColor);
   opacity: 0.8;
   filter:alpha(opacity=80);
+}
+
+// Transitions
+@mixin fade-in ($property: opacity, $duration: 0.2s, $timingFunction: linear){
+	-webkit-transition: $property $duration $timingFunction;
+    -moz-transition: $property $duration $timingFunction;
+    -o-transition: $property $duration $timingFunction;
+    transition: $property $duration $timingFunction;
 }
