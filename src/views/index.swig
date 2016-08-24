@@ -10,7 +10,7 @@
 					<div class="status-message"></div>
 				</div>
 				<div class="door-toggle">
-					<button class="button toggle-door-state">Toggle Door State</button>
+					<button class="button js-door-state-toggle">Toggle Door State</button>
 				</div>
 			</div>
 		</div>

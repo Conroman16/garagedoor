@@ -27,6 +27,8 @@ var GarageDoor = {
 		this.gpio.initialize();
 		this.server.initialize();
 		this.sockets.initialize();
+
+		this.registerExitEvents();
 	},
 
 	events: {
@@ -46,10 +48,13 @@ var GarageDoor = {
 				});
 			}
 		}
+	},
+
+	registerExitEvents: function(){
+		process.on('SIGINT', GarageDoor.events.processExit);
+		process.on('SIGTERM', GarageDoor.events.processExit);
 	}
 };
 
 // Start
 GarageDoor.initialize();
-
-process.on('SIGINT', GarageDoor.events.processExit);

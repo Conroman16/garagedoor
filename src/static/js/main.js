@@ -4,7 +4,7 @@ $(function(){
 	var socket = io.connect(),
 		$status = $('.status-wrap .status-message'),
 		$led = $('.status-wrap .led'),
-		$doorToggle = $('.toggle-door-state');
+		$doorToggle = $('.js-door-state-toggle');
 
 	$.extend(GarageDoor, {
 		events: {

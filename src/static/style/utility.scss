@@ -31,10 +31,10 @@
   display: inline-block;
   
   &.green{
-    @include ledGradient($greenStartColor, $greenEndColor);
+    @include led ($greenStartColor, $greenEndColor);
   }
   &.red{
-    @include ledGradient($redStartColor, $redEndColor);
+    @include led ($redStartColor, $redEndColor);
   }
 }
 textarea,
