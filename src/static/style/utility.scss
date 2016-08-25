@@ -1,4 +1,17 @@
-// Utility
+.night{
+  .button{
+    color: $nightFontColor;
+    border: 2px solid $buttonNightBorderColor;
+    background-color: $buttonNightBackgroundColor;
+    
+    &:hover{
+      background-color: $buttonNightHoverColor;
+    }
+    &:active{
+      background-color: $buttonNightActiveColor;
+    }
+  }
+}
 .button{
   border: 2px solid $buttonBorderColor;
   border-radius: 6px;
@@ -18,13 +31,18 @@
 .hide{
   display: none;
 }
-.unloaded{
-  opacity: 0;
-}
 .center{
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+}
+.overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
 }
 .led {
   border-radius: 100%;
@@ -35,6 +53,9 @@
   }
   &.red{
     @include led ($redStartColor, $redEndColor);
+  }
+  &.yellow{
+    @include led($yellowStartColor, $yellowEndColor)
   }
 }
 textarea,

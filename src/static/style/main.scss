@@ -3,10 +3,20 @@ $greenStartColor: #50db88;
 $greenEndColor: #16cf62;
 $redStartColor: #f4573b;
 $redEndColor: #e32c0c;
+$yellowStartColor: #ffcc00;
+$yellowEndColor: #eabb00;
 $buttonBorderColor: #ccc;
 $buttonBackgroundColor: #fff;
 $buttonHoverColor: #eee;
 $buttonActiveColor: #ddd;
+
+// Night mode
+$nightBackgroundColor: #222;
+$nightFontColor: #fff;
+$buttonNightBorderColor: #666;
+$buttonNightBackgroundColor: #2d2d2d;
+$buttonNightHoverColor: #303030;
+$buttonNightActiveColor: #2a2a2a;
 
 // Imports
 @import 'https://fonts.googleapis.com/css?family=Raleway';
@@ -14,17 +24,32 @@ $buttonActiveColor: #ddd;
 @import 'mixins.scss';
 @import 'utility.scss';
 
-// Style
-.page{
+body{
   font-family: 'Raleway';
-  @include fade-in ();
 
-  .status-led{
-    width: 125px;
-    height: 125px;
+  &.night{
+    color: $nightFontColor;
+    background-color: $nightBackgroundColor;
   }
-  .status-message{
-    font-size: 4em;
-    margin: 0.25em 0 0.5em;
+
+  .page{
+    @include fade-in ();
+
+    &.unloaded{
+      opacity: 0;
+    }
+
+    &.disconnected{
+      opacity: 0.3;
+    }
+
+    .status-led{
+      width: 125px;
+      height: 125px;
+    }
+    .status-message{
+      font-size: 4em;
+      margin: 0.25em 0 0.5em;
+    }
   }
 }
