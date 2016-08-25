@@ -20,6 +20,9 @@
   padding: 1.25em;
   font-size: 1.5em;
   text-transform: uppercase;
+  @include background-color-fade ();
+  @include font-color-fade ();
+  @include border-color-fade ();
   
   &:hover{
     background-color: $buttonHoverColor;

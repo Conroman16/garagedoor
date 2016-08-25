@@ -1,4 +1,5 @@
-var gpio = require('rpi-gpio'),
+var fs = require('fs'),
+	gpio = require('rpi-gpio'),
 	debounce = require('debounce'),
 	path = require('path'),
 	express = require('express'),
@@ -20,6 +21,8 @@ var GarageDoor = {
 	GPIO_IS_INITIALIZED: false,
 
 	initialize: function(){
+		this.config.readFile();
+
 		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio, io, debounce);
 		require(path.join(this.LIB_PATH, 'server.js'))(this, path, http, express, app, sass, swig);
 		require(path.join(this.LIB_PATH, 'sockets.js'))(this, io);
@@ -47,6 +50,14 @@ var GarageDoor = {
 					process.exit();
 				});
 			}
+		}
+	},
+
+	config: {
+		readFile: function(){
+			var fileContents = fs.readFileSync(path.join(__dirname, '.config'), 'utf8');
+			var config = JSON.parse(fileContents);
+			Object.assign(GarageDoor.config, config);
 		}
 	},
 

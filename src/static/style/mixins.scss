@@ -13,9 +13,24 @@
 }
 
 // Transitions
-@mixin fade-in ($property: opacity, $duration: 0.2s, $timingFunction: linear){
-	-webkit-transition: $property $duration $timingFunction;
+@mixin transition ($property, $duration: 0.2s, $timingFunction: linear){
+  -webkit-transition: $property $duration $timingFunction;
   -moz-transition: $property $duration $timingFunction;
   -o-transition: $property $duration $timingFunction;
   transition: $property $duration $timingFunction;
+}
+@mixin fade-in ($property: opacity, $duration: 0.2s, $timingFunction: linear){
+	@include transition ($property, $duration, $timingFunction);
+}
+
+@mixin background-color-fade ($property: background-color, $duration: 0.2s, $timingFunction: linear){
+  @include transition ($property, $duration, $timingFunction);
+}
+
+@mixin font-color-fade ($property: color, $duration: 0.2s, $timingFunction: linear){
+  @include transition ($property, $duration, $timingFunction);
+}
+
+@mixin border-color-fade ($property: border-color, $duration: 0.2s, $timingFunction: linear){
+  @include transition ($property, $duration, $timingFunction);
 }

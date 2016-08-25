@@ -1,6 +1,9 @@
 # Compiled SCSS
 src/static/css/**
 
+# Configuration file
+.config
+
 # Logs
 logs
 *.log

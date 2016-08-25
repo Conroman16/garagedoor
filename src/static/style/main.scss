@@ -26,6 +26,8 @@ $buttonNightActiveColor: #2a2a2a;
 
 body{
   font-family: 'Raleway';
+  @include background-color-fade ();
+  @include font-color-fade ();
 
   &.night{
     color: $nightFontColor;

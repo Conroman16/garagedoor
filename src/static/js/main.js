@@ -39,8 +39,48 @@ $(function(){
 
 		toggleState: function (){
 			socket.emit('toggledoorstate');
+		},
+
+		getSunPhase: function(){
+			return new Promise((resolve, reject) => {
+				$.ajax({
+					url: 'http://api.wunderground.com/api/' + GarageDoor.server.wundergroundApiKey + '/astronomy/q/64151.json',
+					dataType: 'jsonp',
+					success: function(data, status, xhr){
+						resolve(data.sun_phase);
+					},
+					error: function(xhr, status, err){
+						reject(err);
+					}
+				});
+			});
+		},
+
+		setViewTheme: function(){
+			this.getSunPhase().then((data) => {
+				var sunrise = new Date(),
+					sunset = new Date();
+
+				sunrise.setHours(data.sunrise.hour);
+				sunrise.setMinutes(data.sunrise.minute);
+
+				sunset.setHours(data.sunset.hour);
+				sunset.setMinutes(data.sunset.minute);
+
+				var now = new Date();
+				if (now >= sunset){
+					$('body').addClass('night');
+					console.log('Its night');
+				}
+				else if (now < sunrise){
+					$('body').addClass('night');
+					console.log('Its night');
+				}
+			});
 		}
 	});
+
+	GarageDoor.setViewTheme();
 
 	socket.on('dooropen', function (data) {
 		GarageDoor.events.doorOpen();

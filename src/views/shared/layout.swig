@@ -19,7 +19,8 @@
 	<script>
 		var GarageDoor = {
 			server: {
-				doorIsOpen: {{DoorIsOpen}}
+				doorIsOpen: {{DoorIsOpen}},
+				wundergroundApiKey: '{{WundergroundApiKey}}'
 			}
 		};
 	</script>
