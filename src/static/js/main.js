@@ -116,12 +116,12 @@ $(function(){
 
 					if (self.isNight && now <= sunrise){  // Night - Before sunrise - Schedule theme change at both sunrise and sunset
 						self.scheduleThemeChange(sunset);
-						console.log('View will transition to day mode at ' + sunrise);
-						console.log('View will transition to night mode at ' + sunset);
+						log('View will transition to day mode at ' + sunrise);
+						log('View will transition to night mode at ' + sunset);
 					}
 					else if (now >= self.getNextMidnight()){ // Day - Schedule theme change at sunset
 						self.scheduleThemeChange(sunset);
-						console.log('View will transition to night mode at ' + sunset);
+						log('View will transition to night mode at ' + sunset);
 					}
 
 					self.scheduleReloadAtMidnight();
@@ -143,7 +143,7 @@ $(function(){
 					window.location.reload();
 				}, midnight - new Date());
 
-				console.log('Page will be reloaded at ' + midnight);
+				log('Page will be reloaded at ' + midnight);
 			}
 		},
 
