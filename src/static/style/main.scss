@@ -1,4 +1,5 @@
 // Variables
+$fontColor: #000;
 $greenStartColor: #50db88;
 $greenEndColor: #16cf62;
 $redStartColor: #f4573b;
@@ -11,8 +12,8 @@ $buttonHoverColor: #eee;
 $buttonActiveColor: #ddd;
 
 // Night mode
-$nightBackgroundColor: #222;
 $nightFontColor: #fff;
+$nightBackgroundColor: #222;
 $buttonNightBorderColor: #666;
 $buttonNightBackgroundColor: #2d2d2d;
 $buttonNightHoverColor: #303030;
@@ -20,14 +21,15 @@ $buttonNightActiveColor: #2a2a2a;
 
 // Imports
 @import 'https://fonts.googleapis.com/css?family=Raleway';
-@import 'simplegrid.css';
+@import 'simplegrid.scss';
 @import 'mixins.scss';
 @import 'utility.scss';
 
 body{
+  color: $fontColor;
   font-family: 'Raleway';
-  @include background-color-fade ();
   @include font-color-fade ();
+  @include background-color-fade ();
 
   &.night{
     color: $nightFontColor;

@@ -13,10 +13,11 @@
   }
 }
 .button{
+  color: $fontColor;
   border: 2px solid $buttonBorderColor;
-  border-radius: 6px;
   background-color: $buttonBackgroundColor;
   font-family: 'Raleway';
+  border-radius: 6px;
   padding: 1.25em;
   font-size: 1.5em;
   text-transform: uppercase;
@@ -45,7 +46,7 @@
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 10;
+  z-index: 2147483647;
 }
 .led {
   border-radius: 100%;

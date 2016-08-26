@@ -19,7 +19,11 @@
 		var GarageDoor = {
 			server: {
 				doorIsOpen: {{DoorIsOpen}},
-				wundergroundApiKey: '{{WundergroundApiKey}}'
+				wundergroundApiKey: '{{WundergroundApiKey}}',
+				location: {
+					city: '{{Location.city}}',
+					state: '{{Location.state}}'
+				}
 			}
 		};
 	</script>

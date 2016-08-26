@@ -27,7 +27,8 @@ module.exports = function(GarageDoor, path, http, express, app, sass, swig){
 					GarageDoor.gpio.doorIsOpen(function(value){
 						res.render('index', {
 							DoorIsOpen: value,
-							WundergroundApiKey: GarageDoor.config.apikeys.wunderground
+							WundergroundApiKey: GarageDoor.config.apikeys.wunderground,
+							Location: GarageDoor.config.location
 						});
 					});
 				});
