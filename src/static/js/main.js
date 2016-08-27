@@ -38,17 +38,18 @@ $(function(){
 			},
 
 			bindSocketEvents: function(){
+				var self = this;
 				GarageDoor.socket.on('dooropen', function(){
-					GarageDoor.events.doorOpen();
+					self.doorOpen();
 				});
 				GarageDoor.socket.on('doorclose', function(){
-					GarageDoor.events.doorClose();
+					self.doorClose();
 				});
 				GarageDoor.socket.on('disconnect', function(){
-					GarageDoor.events.socketDisconnect();
+					self.socketDisconnect();
 				});
 				GarageDoor.socket.on('connect', function(){
-					GarageDoor.events.socketConnect();
+					self.socketConnect();
 				});
 			}
 		},
@@ -114,14 +115,17 @@ $(function(){
 						self.toggleNightMode();
 					}
 
-					if (self.isNight && now <= sunrise){  // Night - Before sunrise - Schedule theme change at both sunrise and sunset
+					// Before midnight, today's sunrise has already happened,
+					// so `now <= sunrise` can only be true in the AM hours before sunrise
+					if (self.isNight && now <= sunrise){  // AM night
+						self.scheduleThemeChange(sunrise);
 						self.scheduleThemeChange(sunset);
-						log('View will transition to day mode at ' + sunrise);
-						log('View will transition to night mode at ' + sunset);
+						log('Page will transition to day mode at ' + sunrise);
+						log('Page will transition to night mode at ' + sunset);
 					}
-					else if (now >= self.getNextMidnight()){ // Day - Schedule theme change at sunset
+					else if (!self.isNight){ // Day
 						self.scheduleThemeChange(sunset);
-						log('View will transition to night mode at ' + sunset);
+						log('Page will transition to night mode at ' + sunset);
 					}
 
 					self.scheduleReloadAtMidnight();
