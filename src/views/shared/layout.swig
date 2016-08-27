@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	
+
 	<title>Garage Door</title>
 
 	<link rel="icon" href="/static/img/favicon.ico" />

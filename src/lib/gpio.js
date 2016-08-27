@@ -1,4 +1,4 @@
-module.exports = function(GarageDoor, gpio, io, debounce){
+module.exports = function(GarageDoor, gpio, debounce){
 
 	// The way the circuit is wired, a value of '1' or 'true' indicates that
 	// the door is closed and a value of '0' or 'false' indicates it's open

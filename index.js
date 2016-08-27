@@ -4,9 +4,10 @@ var fs = require('fs'),
 	path = require('path'),
 	express = require('express'),
 	app = express(),
-	http = require('http').Server(app),
+	ssl = require('letsencrypt-express'),
+	spdy = require('spdy'),
 	sass = require('node-sass-middleware'),
-	io = require('socket.io')(http),
+	socket = require('socket.io'),
 	swig = require('swig');
 
 var GarageDoor = {
@@ -20,27 +21,25 @@ var GarageDoor = {
 	LIB_PATH: path.join(__dirname, 'src', 'lib'),
 	GPIO_IS_INITIALIZED: false,
 
-	initialize: function(){
-		this.config.readFile();
+	start: function(){
+		this.config.read();
 
-		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio, io, debounce);
-		require(path.join(this.LIB_PATH, 'server.js'))(this, path, http, express, app, sass, swig);
-		require(path.join(this.LIB_PATH, 'sockets.js'))(this, io);
+		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio, debounce);
+		require(path.join(this.LIB_PATH, 'server.js'))(this, path, spdy, ssl, express, app, socket, sass, swig);
 
 		this.gpio.initialize();
 		this.server.initialize();
-		this.sockets.initialize();
 
 		this.registerExitEvents();
 	},
 
 	events: {
 		doorOpen: function(){
-			io.emit('dooropen')
+			GarageDoor.sockets.io.emit('dooropen')
 			console.log('Door opened');
 		},
 		doorClose: function(){
-			io.emit('doorclose');
+			GarageDoor.sockets.io.emit('doorclose');
 			console.log('Door closed');
 		},
 		processExit: function(event){
@@ -54,10 +53,10 @@ var GarageDoor = {
 	},
 
 	config: {
-		readFile: function(){
+		read: () => {
 			var fileContents = fs.readFileSync(path.join(__dirname, '.config'), 'utf8');
 			var config = JSON.parse(fileContents);
-			Object.assign(GarageDoor.config, config);
+			Object.assign(this, config);
 		}
 	},
 
@@ -72,4 +71,4 @@ var GarageDoor = {
 };
 
 // Start
-GarageDoor.initialize();
+GarageDoor.start();

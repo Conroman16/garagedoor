@@ -83,7 +83,7 @@ $(function(){
 					var key = GarageDoor.server.wundergroundApiKey,
 						state = GarageDoor.server.location.state,
 						city = GarageDoor.server.location.city,
-						url = 'http://api.wunderground.com/api/' + GarageDoor.server.wundergroundApiKey + '/astronomy/q/' + state + '/' + city + '.json';
+						url = 'https://api.wunderground.com/api/' + GarageDoor.server.wundergroundApiKey + '/astronomy/q/' + state + '/' + city + '.json';
 
 					$.ajax({
 						url: url,
