@@ -1,11 +1,19 @@
-module.exports = function(GarageDoor, path, spdy, ssl, express, app, socket, sass, swig){
+var socket = require('socket.io'),
+	swig = require('swig'),
+	sass = require('node-sass-middleware'),
+	express = require('express'),
+	ssl = require('letsencrypt-express'),
+	spdy = require('spdy');
+
+module.exports = function(GarageDoor, path){
 	Object.assign(GarageDoor, {
 		sockets: {
 			initialize: function(){
+				this.io = socket.listen(GarageDoor.server.webserver);
 				this.setupEvents();
 			},
 			setupEvents: function(){
-				io.on('connection', function(socket) {
+				this.io.on('connection', function(socket) {
 					console.log(`Socket connected [${socket.handshake.address}]`);
 
 					socket.on('toggledoorstate', function(data){
@@ -20,6 +28,7 @@ module.exports = function(GarageDoor, path, spdy, ssl, express, app, socket, sas
 				sslPort: 443
 			},
 			initialize: function(){
+				this.configureSSL();
 				this.startServer();
 			},
 			configureSSL: function(){
@@ -44,11 +53,11 @@ module.exports = function(GarageDoor, path, spdy, ssl, express, app, socket, sas
 				});
 			},
 			startSockets: function(){
-				io = socket.listen(this.webserver);
 				GarageDoor.sockets.initialize();
 			},
 			startServer: function(){
-				var self = this;
+				var self = this,
+					app = express();
 
 				app.engine('swig', swig.renderFile);
 				app.set('view engine', 'swig');
@@ -80,8 +89,6 @@ module.exports = function(GarageDoor, path, spdy, ssl, express, app, socket, sas
 						}
 					});
 				});
-
-				this.configureSSL();
 
 				this.webserver = spdy.createServer(this.ssl.httpsOptions, this.ssl.middleware(app)).listen(this.defaults.sslPort, () => {
 					console.log(`Application started on *:${self.defaults.sslPort}`);

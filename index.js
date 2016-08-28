@@ -1,14 +1,6 @@
 var fs = require('fs'),
 	gpio = require('rpi-gpio'),
-	debounce = require('debounce'),
-	path = require('path'),
-	express = require('express'),
-	app = express(),
-	ssl = require('letsencrypt-express'),
-	spdy = require('spdy'),
-	sass = require('node-sass-middleware'),
-	socket = require('socket.io'),
-	swig = require('swig');
+	path = require('path');
 
 var GarageDoor = {
 
@@ -24,8 +16,8 @@ var GarageDoor = {
 	start: function(){
 		this.config.read();
 
-		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio, debounce);
-		require(path.join(this.LIB_PATH, 'server.js'))(this, path, spdy, ssl, express, app, socket, sass, swig);
+		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio);
+		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
 
 		this.gpio.initialize();
 		this.server.initialize();
@@ -56,7 +48,7 @@ var GarageDoor = {
 		read: () => {
 			var fileContents = fs.readFileSync(path.join(__dirname, '.config'), 'utf8');
 			var config = JSON.parse(fileContents);
-			Object.assign(this, config);
+			Object.assign(GarageDoor.config, config);
 		}
 	},
 

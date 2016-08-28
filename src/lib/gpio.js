@@ -1,9 +1,13 @@
-module.exports = function(GarageDoor, gpio, debounce){
+var debounce = require('debounce');
+
+module.exports = function(GarageDoor, gpio){
 
 	// The way the circuit is wired, a value of '1' or 'true' indicates that
 	// the door is closed and a value of '0' or 'false' indicates it's open
 	Object.assign(GarageDoor, {
 		gpio: {
+			debounceInterval: 250,
+
 			initialize: function(){
 				gpio.setup(GarageDoor.POSITION_SENSOR_GPIO_PIN, gpio.DIR_IN, gpio.EDGE_BOTH);
 				gpio.setup(GarageDoor.OPENER_RELAY_GPIO_PIN, gpio.DIR_OUT);
@@ -14,16 +18,14 @@ module.exports = function(GarageDoor, gpio, debounce){
 			onChange: debounce(function(channel, value){
 				value = !value;
 				switch (channel){
-					case 11:
-						if (value){
+					case GarageDoor.POSITION_SENSOR_GPIO_PIN:
+						if (value)
 							GarageDoor.events.doorOpen();
-						}
-						else{
+						else
 							GarageDoor.events.doorClose();
-						}
 						break;
 				}
-			}, 100),
+			}, this.debounceInterval),
 			doorIsOpen: function(callback){
 				gpio.read(GarageDoor.POSITION_SENSOR_GPIO_PIN, function(err, value){
 					if (err){
