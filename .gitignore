@@ -4,6 +4,9 @@ src/static/css/**
 # Configuration file
 .config
 
+# Letsencrypt SSL data
+letsencrypt
+
 # Logs
 logs
 *.log

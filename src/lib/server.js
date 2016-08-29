@@ -3,7 +3,8 @@ var socket = require('socket.io'),
 	sass = require('node-sass-middleware'),
 	express = require('express'),
 	ssl = require('letsencrypt-express'),
-	spdy = require('spdy');
+	spdy = require('spdy'),
+	http = require('http');
 
 module.exports = function(GarageDoor, path){
 	Object.assign(GarageDoor, {
@@ -33,7 +34,9 @@ module.exports = function(GarageDoor, path){
 			},
 			configureSSL: function(){
 				this.ssl = ssl.create({
-					server: 'staging',
+					// server: 'staging',
+					server: 'https://acme-v01.api.letsencrypt.org/directory',
+					configDir: path.join(GarageDoor.BASE_PATH, 'letsencrypt'),
 					approveDomains: (opts, certs, cb) => {
 						if (certs)
 							opts.domains = certs.altnames;
@@ -92,6 +95,18 @@ module.exports = function(GarageDoor, path){
 
 				this.webserver = spdy.createServer(this.ssl.httpsOptions, this.ssl.middleware(app)).listen(this.defaults.sslPort, () => {
 					console.log(`Application started on *:${self.defaults.sslPort}`);
+				});
+
+				this.webserver.httpsRedirector = http.createServer((req, res) => {
+					var host = req.headers.host,
+						url = req.url;
+
+					res.writeHead(301, {
+						Location: `https://${host}${url}`
+					});
+					res.end();
+				}).listen(this.defaults.port, () => {
+					console.log(`HTTPS redirector started on *:${self.defaults.port}`);
 				});
 
 				this.startSockets();
