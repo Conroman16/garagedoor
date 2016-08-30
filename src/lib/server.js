@@ -4,7 +4,7 @@ var socket = require('socket.io'),
 	express = require('express'),
 	ssl = require('letsencrypt-express'),
 	spdy = require('spdy'),
-	http = require('http');
+	http = require('http')
 
 module.exports = function(GarageDoor, path){
 	Object.assign(GarageDoor, {
@@ -34,9 +34,8 @@ module.exports = function(GarageDoor, path){
 			},
 			configureSSL: function(){
 				this.ssl = ssl.create({
-					// server: 'staging',
-					server: 'https://acme-v01.api.letsencrypt.org/directory',
-					configDir: path.join(GarageDoor.BASE_PATH, 'letsencrypt'),
+					server: GarageDoor.isDev ? 'staging' : GarageDoor.LETSENCRYPT_CA_URL,
+					configDir: GarageDoor.SSL_DATA_PATH,
 					approveDomains: (opts, certs, cb) => {
 						if (certs)
 							opts.domains = certs.altnames;
