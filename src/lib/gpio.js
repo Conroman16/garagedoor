@@ -7,9 +7,10 @@ module.exports = function(GarageDoor, gpio){
 	Object.assign(GarageDoor, {
 		gpio: {
 			debounceInterval: 250,
+			doorIsClosed: true,
 
 			initialize: function(){
-				gpio.setup(GarageDoor.POSITION_SENSOR_GPIO_PIN, gpio.DIR_IN, gpio.EDGE_BOTH);
+				gpio.setup(GarageDoor.POSITION_SENSOR_GPIO_PIN, gpio.DIR_IN, gpio.EDGE_BOTH, this.setDoorStatus);
 				gpio.setup(GarageDoor.OPENER_RELAY_GPIO_PIN, gpio.DIR_OUT);
 				gpio.on('change', this.onChange);
 
@@ -26,14 +27,21 @@ module.exports = function(GarageDoor, gpio){
 						break;
 				}
 			}, this.debounceInterval),
+			setDoorStatus: function(){
+				// Door is open method updates value of GarageDoor.gpio.doorIsClosed internally
+				GarageDoor.gpio.doorIsOpen();
+			},
 			doorIsOpen: function(callback){
+				var self = this;
 				gpio.read(GarageDoor.POSITION_SENSOR_GPIO_PIN, function(err, value){
 					if (err){
 						console.log(`ERROR: ${err}`);
 						throw err;
 					}
 
-					callback(!value);
+					self.doorIsOpen = value;
+					if (!!callback)
+						callback(!value);
 				});
 			},
 			toggleDoor: function(){

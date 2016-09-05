@@ -1,36 +1,46 @@
+// Disable highlighting
+@mixin no-select (){
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 // Gradients
 @mixin radial-gradient ($startColor, $endColor){
-  background: $startColor;
-  background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
-  background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
-  background: radial-gradient(ellipse at center, $startColor 0%, $endColor 100%);
+	background: $startColor;
+	background: -moz-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+	background: -webkit-radial-gradient(center, ellipse cover, $startColor 0%, $endColor 100%);
+	background: radial-gradient(ellipse at center, $startColor 0%, $endColor 100%);
 }
 
 @mixin led ($centerColor, $edgeColor){
-  @include radial-gradient($centerColor, $edgeColor);
-  opacity: 0.8;
-  filter:alpha(opacity=80);
+	@include radial-gradient($centerColor, $edgeColor);
+	opacity: 0.8;
+	filter:alpha(opacity=80);
 }
 
 // Transitions
 @mixin transition ($property, $duration: 0.2s, $timingFunction: linear){
-  -webkit-transition: $property $duration $timingFunction;
-  -moz-transition: $property $duration $timingFunction;
-  -o-transition: $property $duration $timingFunction;
-  transition: $property $duration $timingFunction;
+	-webkit-transition: $property $duration $timingFunction;
+	-moz-transition: $property $duration $timingFunction;
+	-o-transition: $property $duration $timingFunction;
+	transition: $property $duration $timingFunction;
 }
 @mixin fade-in ($property: opacity, $duration: 0.2s, $timingFunction: linear){
 	@include transition ($property, $duration, $timingFunction);
 }
 
 @mixin background-color-fade ($property: background-color, $duration: 0.2s, $timingFunction: linear){
-  @include transition ($property, $duration, $timingFunction);
+	@include transition ($property, $duration, $timingFunction);
 }
 
 @mixin font-color-fade ($property: color, $duration: 0.2s, $timingFunction: linear){
-  @include transition ($property, $duration, $timingFunction);
+	@include transition ($property, $duration, $timingFunction);
 }
 
 @mixin border-color-fade ($property: border-color, $duration: 0.2s, $timingFunction: linear){
-  @include transition ($property, $duration, $timingFunction);
+	@include transition ($property, $duration, $timingFunction);
 }

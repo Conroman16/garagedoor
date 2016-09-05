@@ -22,7 +22,7 @@ if (dashArgs.indexOf('dev') >= 0){
 var GarageDoor = {
 
 	POSITION_SENSOR_GPIO_PIN: 11,	// Physical pin number
-	OPENER_RELAY_GPIO_PIN: 13,		// Physical pin number
+	OPENER_RELAY_GPIO_PIN: 29,		// Physical pin number
 	DOOR_TOGGLE_TIME: 500, 			// Milliseconds
 	BASE_PATH: __dirname,
 	VIEWS_PATH: path.join(__dirname, 'src', 'views'),
@@ -37,7 +37,7 @@ var GarageDoor = {
 	start: function(){
 		this.config.read();
 
-		require(path.join(this.LIB_PATH,'gpio.js'))(this, gpio);
+		require(path.join(this.LIB_PATH, 'gpio.js'))(this, gpio);
 		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
 
 		this.gpio.initialize();
@@ -49,11 +49,21 @@ var GarageDoor = {
 	events: {
 		exit: ['SIGINT', 'SIGTERM'],
 		doorOpen: function(){
+			if (!GarageDoor.gpio.doorIsClosed)
+				return;
+			else
+				GarageDoor.gpio.doorIsClosed = false;
+
 			GarageDoor.sockets.io.emit('dooropen');
 			var date = moment().format('h:mm:ss a');
 			console.log(`[${date}] Door open`);
 		},
 		doorClose: function(){
+			if (GarageDoor.gpio.doorIsClosed)
+				return;
+			else
+				GarageDoor.gpio.doorIsClosed = true;
+
 			GarageDoor.sockets.io.emit('doorclose');
 			var date = moment().format('h:mm:ss a');
 			console.log(`[${date}] Door closed`);

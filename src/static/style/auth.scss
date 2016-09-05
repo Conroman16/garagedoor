@@ -1,0 +1,56 @@
+.mobile{
+	.pin .input{
+		width: 100%;
+	}
+}
+
+.auth-wrap{
+	.keypad{
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin: auto;
+
+		.keypad-row{
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+
+			.keypad-key{
+				padding: 0.3em;
+				width: 2em;
+				text-align: center;
+				font-size: 24pt;
+				margin: 0.25em;
+				border-radius: 16px;
+				@include fade-in(background, 0.1s);
+
+				&:active{
+					background-color: #ddd;
+				}
+			}
+		}
+	}
+
+  	.pin .input{
+		border: 1px solid #bbb;
+		height: 1.25em;
+		text-align: center;
+		vertical-align: middle;
+		letter-spacing: 15px;
+		font-size: 30pt;
+		outline: none;
+		margin-bottom: 0.5em;
+		@include transition ('outline');
+
+		&.valid{
+			outline: 1px auto green;
+		}
+
+		&.invalid{
+			outline: 1px auto red;
+		}
+    }
+}

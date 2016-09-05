@@ -5,6 +5,17 @@ $(function(){
 	var socket = io.connect({'sync disconnect on unload': true });
 
 	$.extend(GarageDoor, {
+		initialize: function(){
+			if ($.browser.mobile)
+				$('body').addClass('mobile');
+
+			var fingerprint = new Fingerprint2();
+			fingerprint.get(function(print){
+				window.fingerprint = print;
+			});
+
+			GarageDoor.view.initialize();
+		},
 		socket: socket,
 		events: {
 			doorOpen: function (){
@@ -37,6 +48,19 @@ $(function(){
 				GarageDoor.view.$page.removeClass('disconnected');
 			},
 
+			doorAuthReply: function(data){
+				if (!data || data.error || !data.success){
+					GarageDoor.view.$pinInput.addClass('invalid');
+					return false;
+				}
+
+				if (data.success){
+					GarageDoor.view.$pinInput.addClass('valid');
+					GarageDoor.view.setButtonToken(data.token);
+					GarageDoor.view.hideAuth();
+				}
+			},
+
 			bindSocketEvents: function(){
 				var self = this;
 				GarageDoor.socket.on('dooropen', function(){
@@ -51,6 +75,9 @@ $(function(){
 				GarageDoor.socket.on('connect', function(){
 					self.socketConnect();
 				});
+				GarageDoor.socket.on('doorauthreply', function(data){
+					self.doorAuthReply(data);
+				});
 			}
 		},
 
@@ -58,8 +85,57 @@ $(function(){
 			$page: $page,
 			$status: $('.status-wrap .status-message'),
 			$led: $('.status-wrap .led'),
+			$doorToggleWrap: $('.door-toggle'),
 			$doorToggle: $('.js-door-state-toggle'),
+			$authWrap: $('.auth-wrap'),
+			$pinInput: $('.pin-input'),
+			$pinValue: $('.pin-val'),
 			isNight: false,
+			dot: '\u2022',
+
+			initialize: function(){
+				GarageDoor.view.setTheme();
+				GarageDoor.events.bindSocketEvents();
+				GarageDoor.view.$doorToggle.click(function(){
+					GarageDoor.toggleState($(this).data('token'));
+				});
+				GarageDoor.view.maxPinLength = GarageDoor.view.$pinInput.attr('maxlength');
+				GarageDoor.view.setPin('');
+
+				GarageDoor.view.$pinInput.on('keyup', function(){
+					var $this = $(this),
+						value = GarageDoor.view.$pinValue.val();
+
+					if (value.length === 6)
+						GarageDoor.view.validatePin(value);
+					else
+						$this.removeClass('valid invalid');
+				});
+
+				$('.keypad-key:not(".backspace-key")').click(function(){
+					var $this = $(this),
+							value = $this.text(),
+							pin = GarageDoor.view.$pinValue.val();
+
+					if (pin.length == GarageDoor.view.maxPinLength)
+						return;
+					else
+						pin += value;
+
+					GarageDoor.view.setPin(pin);
+					GarageDoor.view.$pinInput.trigger('keyup');
+				});
+
+				$('.backspace-key').click(function(){
+					var value = GarageDoor.view.$pinValue.val();
+					if (value.length <= 0)
+						return;
+
+					value = value.substring(0, value.length - 1);
+					GarageDoor.view.setPin(value);
+					GarageDoor.view.$pinInput.trigger('keyup');
+				});
+			},
 
 			toggleNightMode: function(){
 				$('body').toggleClass('night');
@@ -69,6 +145,20 @@ $(function(){
 					this.isNight = false;
 			},
 
+			showAuth: function(){
+				GarageDoor.view.$doorToggleWrap.addClass('hide');
+				GarageDoor.view.$authWrap.removeClass('hide');
+			},
+
+			hideAuth: function(){
+				GarageDoor.view.$doorToggleWrap.removeClass('hide');
+				GarageDoor.view.$authWrap.addClass('hide');
+			},
+
+			setButtonToken: function(token){
+				GarageDoor.view.$doorToggle.attr('data-token', token);
+			},
+
 			scheduleThemeChange: function(date){
 				var self = this,
 					offset = date - new Date();
@@ -76,6 +166,26 @@ $(function(){
 				setTimeout(function(){
 					self.toggleNightMode();
 				}, offset);
+			},
+
+			setPin(pin){
+				var placeholder = '';
+				for (var i = 0; i < pin.length; i++){
+					placeholder += GarageDoor.view.dot;
+				}
+				for (var i = 0; i < GarageDoor.view.maxPinLength - pin.length; i++){
+					placeholder += '-';
+				}
+
+				GarageDoor.view.$pinInput.val(placeholder);
+				GarageDoor.view.$pinValue.val(pin);
+			},
+
+			validatePin(pin){
+				GarageDoor.socket.emit('doorauth', {
+					pin: pin,
+					fingerprint: window.fingerprint
+				});
 			},
 
 			getSunPhase: function(){
@@ -117,7 +227,7 @@ $(function(){
 
 					// Before midnight, today's sunrise has already happened,
 					// so `now <= sunrise` can only be true in the AM hours before sunrise
-					if (self.isNight && now <= sunrise){  // AM night
+					if (self.isNight && now < sunrise){  // AM night
 						self.scheduleThemeChange(sunrise);
 						self.scheduleThemeChange(sunset);
 						log('Page will transition to day mode at ' + sunrise);
@@ -151,16 +261,13 @@ $(function(){
 			}
 		},
 
-		toggleState: function (){
-			socket.emit('toggledoorstate');
+		toggleState: function (token){
+			socket.emit('toggledoorstate', {
+				token: token,
+				fingerprint: window.fingerprint
+			});
 		}
 	});
 
-	GarageDoor.view.setTheme();
-
-	GarageDoor.events.bindSocketEvents();
-
-	GarageDoor.view.$doorToggle.click(function(){
-		GarageDoor.toggleState();
-	});
+	GarageDoor.initialize();
 });
