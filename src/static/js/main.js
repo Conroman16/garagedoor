@@ -92,6 +92,7 @@ $(function(){
 			$pinValue: $('.pin-val'),
 			isNight: false,
 			dot: '\u2022',
+			placeholder: '\uf096',
 
 			initialize: function(){
 				GarageDoor.view.setTheme();
@@ -99,14 +100,15 @@ $(function(){
 				GarageDoor.view.$doorToggle.click(function(){
 					GarageDoor.toggleState($(this).data('token'));
 				});
-				GarageDoor.view.maxPinLength = GarageDoor.view.$pinInput.attr('maxlength');
+				GarageDoor.view.maxPinLength = GarageDoor.server.pinLength;
+				GarageDoor.view.$pinInput.attr('maxlength', GarageDoor.server.pinLength);
 				GarageDoor.view.setPin('');
 
 				GarageDoor.view.$pinInput.on('keyup', function(){
 					var $this = $(this),
 						value = GarageDoor.view.$pinValue.val();
 
-					if (value.length === 6)
+					if (value.length === GarageDoor.view.maxPinLength)
 						GarageDoor.view.validatePin(value);
 					else
 						$this.removeClass('valid invalid');
@@ -114,8 +116,8 @@ $(function(){
 
 				$('.keypad-key:not(".backspace-key")').click(function(){
 					var $this = $(this),
-							value = $this.text(),
-							pin = GarageDoor.view.$pinValue.val();
+						value = $this.text(),
+						pin = GarageDoor.view.$pinValue.val();
 
 					if (pin.length == GarageDoor.view.maxPinLength)
 						return;
@@ -173,9 +175,11 @@ $(function(){
 				for (var i = 0; i < pin.length; i++){
 					placeholder += GarageDoor.view.dot;
 				}
-				for (var i = 0; i < GarageDoor.view.maxPinLength - pin.length; i++){
-					placeholder += '-';
-				}
+
+				// Insert placeholder text for the empty spaces
+				// for (var i = 0; i < GarageDoor.view.maxPinLength - pin.length; i++){
+				// 	placeholder += GarageDoor.view.placeholder;
+				// }
 
 				GarageDoor.view.$pinInput.val(placeholder);
 				GarageDoor.view.$pinValue.val(pin);

@@ -5,7 +5,8 @@ var socket = require('socket.io'),
 	ssl = require('letsencrypt-express'),
 	spdy = require('spdy'),
 	http = require('http'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	_ = require('underscore');
 
 module.exports = function(GarageDoor, path){
 	Object.assign(GarageDoor, {
@@ -42,11 +43,9 @@ module.exports = function(GarageDoor, path){
 				}
 			},
 			validateSession: (token, fingerprint) => {
-				for (var i = 0; i < GarageDoor.auth.sessions.length; i++){
-					var t = GarageDoor.auth.sessions[i];
-					if (t.token == token && t.fingerprint == fingerprint)
-						return true;
-				}
+				var existingSession = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
+				if (existingSession)
+					return true;
 				return false;
 			}
 		},
@@ -140,7 +139,7 @@ module.exports = function(GarageDoor, path){
 				app.use(sass({
 					src: path.join(GarageDoor.STATIC_FILES_PATH, 'style'),
 					dest: path.join(GarageDoor.STATIC_FILES_PATH, 'css'),
-					outputStyle: 'compressed',
+					outputStyle: GarageDoor.isDev ? 'expanded' : 'compressed',
 					prefix: '/static/css'
 				}));
 
@@ -150,7 +149,8 @@ module.exports = function(GarageDoor, path){
 					res.render('index', {
 						DoorIsOpen: !GarageDoor.gpio.doorIsClosed,
 						WundergroundApiKey: GarageDoor.config.apikeys.wunderground,
-						Location: GarageDoor.config.location
+						Location: GarageDoor.config.location,
+						PinLength: GarageDoor.config.doorcode.length
 					});
 				});
 

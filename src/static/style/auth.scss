@@ -42,7 +42,7 @@
 		letter-spacing: 15px;
 		font-size: 30pt;
 		outline: none;
-		margin-bottom: 0.5em;
+		margin-bottom: 0.25em;
 		@include transition ('outline');
 
 		&.valid{

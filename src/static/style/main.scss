@@ -52,9 +52,15 @@ body{
       width: 125px;
       height: 125px;
     }
+
     .status-message{
       font-size: 4em;
-      margin: 0.25em 0 0.5em;
+      margin: 0.25em 0;
+      word-wrap: break-word;
+    }
+
+    .door-toggle{
+    	margin-top: 2em;
     }
   }
 }
