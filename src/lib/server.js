@@ -20,21 +20,9 @@ module.exports = function(GarageDoor, path){
 				});
 			},
 			newSession: (token, fingerprint) => {
-				var sessionExists = false,
-					session;
-				for (var i = 0; i < GarageDoor.auth.sessions.length; i ++){
-					var t = GarageDoor.auth.sessions[i];
-
-					if (t.fingerprint == fingerprint){
-						sessionExists = true;
-						session = t;
-						break;
-					}
-				}
-
-				if (sessionExists){
-					t.token = token;
-				}
+				var session = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
+				if (session)
+					session.token = token;
 				else{
 					GarageDoor.auth.sessions.push({
 						token: token,
@@ -43,7 +31,7 @@ module.exports = function(GarageDoor, path){
 				}
 			},
 			validateSession: (token, fingerprint) => {
-				var existingSession = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
+				var existingSession = _.findWhere(GarageDoor.auth.sessions, {token: token, fingerprint: fingerprint});
 				if (existingSession)
 					return true;
 				return false;
