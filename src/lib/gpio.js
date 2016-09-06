@@ -6,7 +6,7 @@ module.exports = function(GarageDoor, gpio){
 	// the door is closed and a value of '0' or 'false' indicates it's open
 	Object.assign(GarageDoor, {
 		gpio: {
-			debounceInterval: 250,
+			debounceInterval: 500,
 			doorIsClosed: true,
 
 			initialize: function(){
