@@ -21,13 +21,16 @@ module.exports = function(GarageDoor, path){
 			},
 			newSession: (token, fingerprint) => {
 				var session = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
-				if (session)
+				if (session){
 					session.token = token;
+					console.log(`Session refreshed [${fingerprint}]`);
+				}
 				else{
 					GarageDoor.auth.sessions.push({
 						token: token,
 						fingerprint: fingerprint
 					});
+					console.log(`Session authenticated [${fingerprint}]`);
 				}
 			},
 			validateSession: (token, fingerprint) => {

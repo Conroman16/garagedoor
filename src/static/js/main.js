@@ -35,6 +35,7 @@ $(function(){
 				GarageDoor.view.$led.removeClass('green red');
 				GarageDoor.view.$led.addClass('yellow');
 				GarageDoor.view.$page.addClass('disconnected');
+				GarageDoor.view.showAuth();
 				$('body').append('<div class="overlay"></div>');
 			},
 
@@ -155,10 +156,17 @@ $(function(){
 			hideAuth: function(){
 				GarageDoor.view.$doorToggleWrap.removeClass('hide');
 				GarageDoor.view.$authWrap.addClass('hide');
+				GarageDoor.view.resetAuth();
 			},
 
 			setButtonToken: function(token){
 				GarageDoor.view.$doorToggle.attr('data-token', token);
+			},
+
+			resetAuth: function(){
+				GarageDoor.view.$pinInput.removeClass('valid invalid');
+				GarageDoor.view.$pinInput.val('');
+				GarageDoor.view.$pinValue.val('');
 			},
 
 			scheduleThemeChange: function(date){
