@@ -7,6 +7,9 @@ src/static/css/**
 # Letsencrypt SSL data
 letsencrypt
 
+# Database
+data.db
+
 # Logs
 logs
 *.log

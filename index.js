@@ -31,6 +31,7 @@ var GarageDoor = {
 	SSL_DATA_PATH: path.join(__dirname, 'letsencrypt'),
 	LETSENCRYPT_CA_URL: 'https://acme-v01.api.letsencrypt.org/directory',
 	GPIO_IS_INITIALIZED: false,
+	DB_FILE: path.join(__dirname, 'data.db'),
 	arguments: dashArgs,
 	isDev: isDev,
 
@@ -39,8 +40,10 @@ var GarageDoor = {
 
 		require(path.join(this.LIB_PATH, 'gpio.js'))(this, gpio);
 		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
+		require(path.join(this.LIB_PATH, 'data.js'))(this);
 
 		this.gpio.initialize();
+		this.data.initialize();
 		this.server.initialize();
 
 		this.events.registerExitEvents();
@@ -71,6 +74,7 @@ var GarageDoor = {
 		processExit: function(event){
 			if (!!GarageDoor.GPIO_IS_INITIALIZED){
 				console.log(`\n${event} received.  Freeing resources...`);
+				GarageDoor.data.dispose();
 				gpio.destroy(() => {
 					process.exit();
 				});
