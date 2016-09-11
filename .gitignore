@@ -10,6 +10,10 @@ letsencrypt
 # Database
 data.db
 
+# macOS filesystem metadata
+._.DS_Store
+.DS_Store
+
 # Logs
 logs
 *.log
