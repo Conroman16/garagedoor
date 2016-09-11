@@ -13,7 +13,6 @@ module.exports = function(GarageDoor, path){
 		auth: {
 			sessions: [],
 			generateToken: function(callback){
-				var token;
 				crypto.randomBytes(64, function(err, buffer){
 					var token = buffer.toString('hex');
 					callback(token);
@@ -24,6 +23,15 @@ module.exports = function(GarageDoor, path){
 				if (session){
 					session.token = token;
 					console.log(`Session refreshed [${fingerprint}]`);
+					GarageDoor.data.logNewEvent({
+						event: 'SessionRefresh',
+						data: {
+							session: {
+								fingerprint: fingerprint,
+								token: token
+							}
+						}
+					});
 				}
 				else{
 					GarageDoor.auth.sessions.push({
@@ -31,6 +39,15 @@ module.exports = function(GarageDoor, path){
 						fingerprint: fingerprint
 					});
 					console.log(`Session authenticated [${fingerprint}]`);
+					GarageDoor.data.logNewEvent({
+						event: 'SessionAuth',
+						data: {
+							session: {
+								fingerprint: fingerprint,
+								token: token
+							}
+						}
+					});
 				}
 			},
 			validateSession: (token, fingerprint) => {
@@ -48,13 +65,30 @@ module.exports = function(GarageDoor, path){
 			setupEvents: function(){
 				this.io.on('connection', function(socket) {
 					console.log(`Socket connected [${socket.handshake.address}]`);
+					GarageDoor.data.logNewEvent({
+						event: 'SocketConnect',
+						data: {
+							socketIP: socket.handshake.address
+						}
+					});
 
 					socket.on('toggledoorstate', function(data){
 						if (!data || !data.fingerprint || !data.token)
 							return;
 
-						if (GarageDoor.auth.validateSession(data.token, data.fingerprint))
+						if (GarageDoor.auth.validateSession(data.token, data.fingerprint)){
 							GarageDoor.gpio.toggleDoor();
+
+							GarageDoor.data.logNewEvent({
+								event: 'ToggleDoorState',
+								data: {
+									session: {
+										fingerprint: data.fingerprint,
+										token: data.token
+									}
+								}
+							});
+						}
 					});
 
 					socket.on('doorauth', (data) => {
@@ -96,7 +130,7 @@ module.exports = function(GarageDoor, path){
 			},
 			configureSSL: function(){
 				this.ssl = ssl.create({
-					server: GarageDoor.isDev ? 'staging' : GarageDoor.LETSENCRYPT_CA_URL,
+					server: GarageDoor.isDev ? 'staging' : GarageDoor.config.ssl.ca_url,
 					configDir: GarageDoor.SSL_DATA_PATH,
 					approveDomains: (opts, certs, cb) => {
 						if (certs)

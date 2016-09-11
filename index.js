@@ -1,4 +1,5 @@
-var fs = require('fs'),
+var _ = require('underscore'),
+	fs = require('fs'),
 	gpio = require('rpi-gpio'),
 	path = require('path'),
 	moment = require('moment'),
@@ -12,7 +13,6 @@ for (var i = 0; i < process.argv.length; i++){
 		dashArgs.push(cleanArg);
 	}
 }
-dashArgs = dashArgs.reverse();
 
 if (dashArgs.indexOf('dev') >= 0){
 	isDev = true;
@@ -29,7 +29,6 @@ var GarageDoor = {
 	STATIC_FILES_PATH: path.join(__dirname, 'src', 'static'),
 	LIB_PATH: path.join(__dirname, 'src', 'lib'),
 	SSL_DATA_PATH: path.join(__dirname, 'letsencrypt'),
-	LETSENCRYPT_CA_URL: 'https://acme-v01.api.letsencrypt.org/directory',
 	GPIO_IS_INITIALIZED: false,
 	DB_FILE: path.join(__dirname, 'data.db'),
 	arguments: dashArgs,
@@ -46,11 +45,12 @@ var GarageDoor = {
 		this.data.initialize();
 		this.server.initialize();
 
+		this.events.registerErrorHandler();
 		this.events.registerExitEvents();
 	},
 
 	events: {
-		exit: ['SIGINT', 'SIGTERM'],
+		exit: ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK', 'PROCERR'],
 		doorOpen: function(){
 			if (!GarageDoor.gpio.doorIsClosed)
 				return;
@@ -60,6 +60,7 @@ var GarageDoor = {
 			GarageDoor.sockets.io.emit('dooropen');
 			var date = moment().format('h:mm:ss a');
 			console.log(`[${date}] Door open`);
+			GarageDoor.data.logDoorOpen(true);
 		},
 		doorClose: function(){
 			if (GarageDoor.gpio.doorIsClosed)
@@ -70,6 +71,7 @@ var GarageDoor = {
 			GarageDoor.sockets.io.emit('doorclose');
 			var date = moment().format('h:mm:ss a');
 			console.log(`[${date}] Door closed`);
+			GarageDoor.data.logDoorClose(false);
 		},
 		processExit: function(event){
 			if (!!GarageDoor.GPIO_IS_INITIALIZED){
@@ -80,14 +82,19 @@ var GarageDoor = {
 				});
 			}
 		},
+		registerErrorHandler: () => {
+			process.on('uncaughtException', (err) => {
+				GarageDoor.data.logError(err);
+				process.emit('PROCERR');
+			});
+		},
 		registerExitEvents: function(){
 			var self = this;
-			for (var i = 0; i < this.exit.length; i++){
-				var event = this.exit[i];
-				process.on(event, function(){
+			_.each(this.exit, (event) => {
+				process.on(event, () => {
 					self.processExit(event);
 				});
-			}
+			});
 		}
 	},
 

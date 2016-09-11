@@ -151,6 +151,7 @@ $(function(){
 			showAuth: function(){
 				GarageDoor.view.$doorToggleWrap.addClass('hide');
 				GarageDoor.view.$authWrap.removeClass('hide');
+				GarageDoor.view.$doorToggle.attr('data-token', '');
 			},
 
 			hideAuth: function(){
@@ -159,14 +160,14 @@ $(function(){
 				GarageDoor.view.resetAuth();
 			},
 
-			setButtonToken: function(token){
-				GarageDoor.view.$doorToggle.attr('data-token', token);
-			},
-
 			resetAuth: function(){
 				GarageDoor.view.$pinInput.removeClass('valid invalid');
 				GarageDoor.view.$pinInput.val('');
 				GarageDoor.view.$pinValue.val('');
+			},
+
+			setButtonToken: function(token){
+				GarageDoor.view.$doorToggle.attr('data-token', token);
 			},
 
 			scheduleThemeChange: function(date){
