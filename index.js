@@ -1,6 +1,5 @@
 var _ = require('underscore'),
 	fs = require('fs'),
-	gpio = require('rpi-gpio'),
 	path = require('path'),
 	moment = require('moment'),
 	dashArgs = [],
@@ -37,7 +36,7 @@ var GarageDoor = {
 	start: function(){
 		this.config.read();
 
-		require(path.join(this.LIB_PATH, 'gpio.js'))(this, gpio);
+		require(path.join(this.LIB_PATH, 'gpio.js'))(this);
 		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
 		require(path.join(this.LIB_PATH, 'data.js'))(this);
 
@@ -77,7 +76,7 @@ var GarageDoor = {
 			if (!!GarageDoor.GPIO_IS_INITIALIZED){
 				console.log(`\n${event} received.  Freeing resources...`);
 				GarageDoor.data.dispose();
-				gpio.destroy(() => {
+				GarageDoor.gpio.middleware.destroy(() => {
 					process.exit();
 				});
 			}
@@ -85,7 +84,11 @@ var GarageDoor = {
 		registerErrorHandler: () => {
 			process.on('uncaughtException', (err) => {
 				GarageDoor.data.logError(err);
-				process.emit('PROCERR');
+				console.log(`ERROR -> ${err.message}`);
+				console.log(err.stack);
+
+				if (GarageDoor.isDev)
+					process.emit('PROCERR');
 			});
 		},
 		registerExitEvents: function(){

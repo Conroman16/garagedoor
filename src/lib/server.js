@@ -9,202 +9,180 @@ var socket = require('socket.io'),
 	_ = require('underscore');
 
 module.exports = function(GarageDoor, path){
-	Object.assign(GarageDoor, {
-		auth: {
-			sessions: [],
-			generateToken: function(callback){
-				crypto.randomBytes(64, function(err, buffer){
-					var token = buffer.toString('hex');
-					callback(token);
+
+	// AUTHENTICATION
+	GarageDoor.auth = {
+		sessions: [],
+		generateToken: function(callback){
+			crypto.randomBytes(64, function(err, buffer){
+				var token = buffer.toString('hex');
+				callback(token);
+			});
+		},
+		newSession: (token, fingerprint) => {
+			var session = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
+			if (session){
+				session.token = token;
+				console.log(`Session refreshed [${fingerprint}]`);
+				GarageDoor.data.logSessionRefresh(token, fingerprint);
+			}
+			else{
+				GarageDoor.auth.sessions.push({
+					token: token,
+					fingerprint: fingerprint
 				});
-			},
-			newSession: (token, fingerprint) => {
-				var session = _.findWhere(GarageDoor.auth.sessions, {fingerprint: fingerprint});
-				if (session){
-					session.token = token;
-					console.log(`Session refreshed [${fingerprint}]`);
-					GarageDoor.data.logNewEvent({
-						event: 'SessionRefresh',
-						data: {
-							session: {
-								fingerprint: fingerprint,
-								token: token
-							}
-						}
-					});
-				}
-				else{
-					GarageDoor.auth.sessions.push({
-						token: token,
-						fingerprint: fingerprint
-					});
-					console.log(`Session authenticated [${fingerprint}]`);
-					GarageDoor.data.logNewEvent({
-						event: 'SessionAuth',
-						data: {
-							session: {
-								fingerprint: fingerprint,
-								token: token
-							}
-						}
-					});
-				}
-			},
-			validateSession: (token, fingerprint) => {
-				var existingSession = _.findWhere(GarageDoor.auth.sessions, {token: token, fingerprint: fingerprint});
-				if (existingSession)
-					return true;
-				return false;
+				console.log(`Session authenticated [${fingerprint}]`);
+				GarageDoor.data.logSessionAuth(token, fingerprint);
 			}
 		},
-		sockets: {
-			initialize: function(){
-				this.io = socket.listen(GarageDoor.server.webserver);
-				this.setupEvents();
-			},
-			setupEvents: function(){
-				this.io.on('connection', function(socket) {
-					console.log(`Socket connected [${socket.handshake.address}]`);
-					GarageDoor.data.logNewEvent({
-						event: 'SocketConnect',
-						data: {
-							socketIP: socket.handshake.address
-						}
-					});
+		validateSession: (token, fingerprint) => {
+			var existingSession = _.findWhere(GarageDoor.auth.sessions, {token: token, fingerprint: fingerprint});
+			if (existingSession)
+				return true;
+			return false;
+		}
+	};
 
-					socket.on('toggledoorstate', function(data){
-						if (!data || !data.fingerprint || !data.token)
-							return;
-
-						if (GarageDoor.auth.validateSession(data.token, data.fingerprint)){
-							GarageDoor.gpio.toggleDoor();
-
-							GarageDoor.data.logNewEvent({
-								event: 'ToggleDoorState',
-								data: {
-									session: {
-										fingerprint: data.fingerprint,
-										token: data.token
-									}
-								}
-							});
-						}
-					});
-
-					socket.on('doorauth', (data) => {
-						var ret = {
-							error: true,
-							success: false
-						};
-						if (!data || !data.fingerprint || !data.pin)
-							socket.emit('doorauthreply', ret);
-
-						if (data.pin == GarageDoor.config.doorcode){
-							GarageDoor.auth.generateToken((token) => {
-								if (!token)
-									socket.emit('doorauthreply', ret);
-
-								GarageDoor.auth.newSession(token, data.fingerprint);
-
-								socket.emit('doorauthreply', Object.assign(ret, {
-									error: false,
-									success: true,
-									token: token
-								}));
-							});
-						}
-						else
-							socket.emit('doorauthreply', Object.assign(ret, {error: false}));
-					});
-				});
-			}
+	// SOCKETS
+	GarageDoor.sockets = {
+		initialize: function(){
+			this.io = socket.listen(GarageDoor.server.webserver);
+			this.setupEvents();
 		},
-		server: {
-			defaults: {
-				port: 80,
-				sslPort: 443
-			},
-			initialize: function(){
-				this.configureSSL();
-				this.startServer();
-			},
-			configureSSL: function(){
-				this.ssl = ssl.create({
-					server: GarageDoor.isDev ? 'staging' : GarageDoor.config.ssl.ca_url,
-					configDir: GarageDoor.SSL_DATA_PATH,
-					approveDomains: (opts, certs, cb) => {
-						if (certs)
-							opts.domains = certs.altnames;
-						else{
-							Object.assign(opts, {
-								agreeTos: true,
-								email: GarageDoor.config.ssl.email,
-								domains: GarageDoor.config.ssl.domains
-							});
-						}
+		setupEvents: function(){
+			this.io.on('connection', function(socket) {
+				console.log(`Socket connected [${socket.handshake.address}]`);
+				GarageDoor.data.logSocketConnection(socket);
 
-						cb(null, {
-							options: opts,
-							certs: certs
-						});
+				socket.on('toggledoorstate', function(data){
+					if (!data || !data.fingerprint || !data.token)
+						return;
+
+					var token = data.token,
+						fingerprint = data.fingerprint;
+
+					if (GarageDoor.auth.validateSession(token, fingerprint)){
+						GarageDoor.gpio.toggleDoor();
+
+						GarageDoor.data.logDoorStateToggle(token, fingerprint);
 					}
 				});
-			},
-			startSockets: function(){
-				GarageDoor.sockets.initialize();
-			},
-			startServer: function(){
-				var self = this,
-					app = express();
 
-				app.engine('swig', swig.renderFile);
-				app.set('view engine', 'swig');
-				app.set('views', GarageDoor.VIEWS_PATH);
+				socket.on('doorauth', (data) => {
+					var ret = {
+						error: true,
+						success: false
+					};
+					if (!data || !data.fingerprint || !data.pin)
+						socket.emit('doorauthreply', ret);
 
-				app.use(sass({
-					src: path.join(GarageDoor.STATIC_FILES_PATH, 'style'),
-					dest: path.join(GarageDoor.STATIC_FILES_PATH, 'css'),
-					outputStyle: GarageDoor.isDev ? 'expanded' : 'compressed',
-					prefix: '/static/css'
-				}));
+					if (data.pin == GarageDoor.config.doorcode){
+						GarageDoor.auth.generateToken((token) => {
+							if (!token)
+								socket.emit('doorauthreply', ret);
 
-				app.use('/static', express.static(GarageDoor.STATIC_FILES_PATH));
+							GarageDoor.auth.newSession(token, data.fingerprint);
 
-				app.get('/', function(req, res){
-					res.render('index', {
-						DoorIsOpen: !GarageDoor.gpio.doorIsClosed,
-						WundergroundApiKey: GarageDoor.config.apikeys.wunderground,
-						Location: GarageDoor.config.location,
-						PinLength: GarageDoor.config.doorcode.length
-					});
+							socket.emit('doorauthreply', Object.assign(ret, {
+								error: false,
+								success: true,
+								token: token
+							}));
+						});
+					}
+					else
+						socket.emit('doorauthreply', Object.assign(ret, {error: false}));
 				});
-
-				app.get('/license', function(req, res){
-					res.sendFile(path.join(GarageDoor.BASE_PATH, 'LICENSE'), {
-						headers: {
-							'Content-Type': 'text/plain'
-						}
-					});
-				});
-
-				this.webserver = spdy.createServer(this.ssl.httpsOptions, this.ssl.middleware(app)).listen(this.defaults.sslPort, () => {
-					console.log(`Application started on *:${self.defaults.sslPort}`);
-				});
-
-				this.webserver.httpsRedirector = http.createServer((req, res) => {
-					var host = req.headers.host,
-						url = req.url;
-
-					res.writeHead(301, {
-						Location: `https://${host}${url}`
-					});
-					res.end();
-				}).listen(this.defaults.port, () => {
-					console.log(`HTTPS redirector started on *:${self.defaults.port}`);
-				});
-
-				this.startSockets();
-			}
+			});
 		}
-	});
+	};
+
+	// SERVER
+	GarageDoor.server = {
+		defaults: {
+			port: 80,
+			sslPort: 443
+		},
+		initialize: function(){
+			this.configureSSL();
+			this.startServer();
+		},
+		configureSSL: function(){
+			this.ssl = ssl.create({
+				server: GarageDoor.isDev ? 'staging' : GarageDoor.config.ssl.ca_url,
+				configDir: GarageDoor.SSL_DATA_PATH,
+				approveDomains: (opts, certs, cb) => {
+					if (certs)
+						opts.domains = certs.altnames;
+					else{
+						Object.assign(opts, {
+							agreeTos: true,
+							email: GarageDoor.config.ssl.email,
+							domains: GarageDoor.config.ssl.domains
+						});
+					}
+
+					cb(null, {
+						options: opts,
+						certs: certs
+					});
+				}
+			});
+		},
+		startSockets: function(){
+			GarageDoor.sockets.initialize();
+		},
+		startServer: function(){
+			var self = this,
+				app = express();
+
+			app.engine('swig', swig.renderFile);
+			app.set('view engine', 'swig');
+			app.set('views', GarageDoor.VIEWS_PATH);
+
+			app.use(sass({
+				src: path.join(GarageDoor.STATIC_FILES_PATH, 'style'),
+				dest: path.join(GarageDoor.STATIC_FILES_PATH, 'css'),
+				outputStyle: GarageDoor.isDev ? 'expanded' : 'compressed',
+				prefix: '/static/css'
+			}));
+
+			app.use('/static', express.static(GarageDoor.STATIC_FILES_PATH));
+
+			app.get('/', function(req, res){
+				res.render('index', {
+					DoorIsOpen: !GarageDoor.gpio.doorIsClosed,
+					WundergroundApiKey: GarageDoor.config.apikeys.wunderground,
+					Location: GarageDoor.config.location,
+					PinLength: GarageDoor.config.doorcode.length
+				});
+			});
+
+			app.get('/license', function(req, res){
+				res.sendFile(path.join(GarageDoor.BASE_PATH, 'LICENSE'), {
+					headers: {
+						'Content-Type': 'text/plain'
+					}
+				});
+			});
+
+			this.webserver = spdy.createServer(this.ssl.httpsOptions, this.ssl.middleware(app)).listen(this.defaults.sslPort, () => {
+				console.log(`Application started on *:${self.defaults.sslPort}`);
+			});
+
+			this.webserver.httpsRedirector = http.createServer((req, res) => {
+				var host = req.headers.host,
+					url = req.url;
+
+				res.writeHead(301, {
+					Location: `https://${host}${url}`
+				});
+				res.end();
+			}).listen(this.defaults.port, () => {
+				console.log(`HTTPS redirector started on *:${self.defaults.port}`);
+			});
+
+			this.startSockets();
+		}
+	};
 }
