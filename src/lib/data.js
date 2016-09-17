@@ -15,6 +15,12 @@ module.exports = (GarageDoor) => {
 				eventLog: 'INSERT INTO EventLog (timestamp, event, event_data) VALUES (?, ?, ?)',
 				doorLog: 'INSERT INTO DoorLog (timestamp, is_open) VALUES (?, ?)',
 				errorLog: 'INSERT INTO ErrorLog (timestamp, error_message, stack_trace) VALUES (?, ?, ?)'
+			select: {
+				allEvents: 'SELECT * FROM EventLog',
+				allToggleDoorStateEvents: 'SELECT * FROM EventLog WHERE event = \'ToggleDoorState\'',
+				allSessionEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%session%\'',
+				allSocketEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%socket%\'',
+				userByDoorCode: 'SELECT * FROM Users WHERE door_code = \'?\''
 			}
 		},
 
@@ -56,13 +62,58 @@ module.exports = (GarageDoor) => {
 			});
 		},
 
-		logDoorStateChange: (isOpen) => {
+		logSessionAuth: (token, fingerprint) => {
+			GarageDoor.data.logNewEvent({
+				event: 'SessionAuth',
+				data: {
+					session: {
+						fingerprint: fingerprint,
+						token: token
+					}
+				}
+			});
+		},
+
+		logSessionRefresh: (token, fingerprint) => {
+			GarageDoor.data.logNewEvent({
+				event: 'SessionRefresh',
+				data: {
+					session: {
+						fingerprint: fingerprint,
+						token: token
+					}
+				}
+			});
+		},
+
+		logSocketConnection: (socket) => {
+			GarageDoor.data.logNewEvent({
+				event: 'SocketConnect',
+				data: {
+					socketIP: socket.handshake.address
+				}
+			});
+		},
+
+		logDoorStateToggle: (token, fingerprint) => {
+			GarageDoor.data.logNewEvent({
+				event: 'ToggleDoorState',
+				data: {
+					session: {
+						fingerprint: fingerprint,
+						token: token
+					}
+				}
+			});
+		},
+
+		logDoorStateChange: (isOpen, session) => {
 			if (isOpen === undefined)
 				return;
 
 			GarageDoor.data.db.serialize(() => {
 				var stmt = GarageDoor.data.db.prepare(GarageDoor.data.queries.insert.doorLog);
-				stmt.run(new Date(), isOpen);
+				stmt.run(new Date(), isOpen, session.id);
 				stmt.finalize();
 			});
 		},
@@ -83,6 +134,50 @@ module.exports = (GarageDoor) => {
 				var stmt = GarageDoor.data.db.prepare(GarageDoor.data.queries.insert.errorLog);
 				stmt.run(new Date(), err.message, err.stack);
 				stmt.finalize();
+			});
+		},
+
+		getAllEvents: () => {
+			return new Promise((resolve, reject) => {
+				GarageDoor.data.db.all(GarageDoor.data.queries.select.allEvents, (err, rows) => {
+					if (err)
+						reject(err);
+
+					resolve(rows);
+				});
+			});
+		},
+
+		getAllSocketEvents: () => {
+			return new Promise((resolve, reject) => {
+				GarageDoor.data.db.all(GarageDoor.data.queries.select.allSocketEvents, (err, rows) => {
+					if (err)
+						reject(err);
+
+					resolve(rows);
+				});
+			});
+		},
+
+		getAllToggleDoorStates: () => {
+			return new Promise((resolve, reject) => {
+				GarageDoor.data.db.all(GarageDoor.data.queries.select.allToggleDoorStateEvents, (err, rows) => {
+					if (err)
+						reject(err);
+
+					resolve(rows);
+				});
+			});
+		},
+
+		getAllSessionEvents: () => {
+			return new Promise((resolve, reject) => {
+				GarageDoor.data.db.all(GarageDoor.data.queries.select.allSessionEvents, (err, rows) => {
+					if (err)
+						reject(err);
+
+					resolve(rows);
+				});
 			});
 		}
 	};
