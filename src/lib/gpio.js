@@ -22,9 +22,9 @@ module.exports = function(GarageDoor){
 			switch (channel){
 				case GarageDoor.POSITION_SENSOR_GPIO_PIN:
 					if (value)
-						GarageDoor.events.doorOpen();
+						process.emit('DOOROPEN');
 					else
-						GarageDoor.events.doorClose();
+						process.emit('DOORCLOSED');
 					break;
 			}
 		}, this.debounceInterval),

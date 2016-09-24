@@ -1,7 +1,5 @@
-var _ = require('underscore'),
-	fs = require('fs'),
+var fs = require('fs'),
 	path = require('path'),
-	moment = require('moment'),
 	dashArgs = [],
 	isDev = false;
 
@@ -14,8 +12,8 @@ for (var i = 0; i < process.argv.length; i++){
 }
 
 if (dashArgs.indexOf('dev') >= 0){
-	isDev = true;
 	console.log('DEV MODE');
+	isDev = true;
 	process.env.NODE_ENV = 'development';
 }
 else
@@ -40,68 +38,14 @@ var GarageDoor = {
 		this.config.read();
 
 		require(path.join(this.LIB_PATH, 'gpio.js'))(this);
-		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
+		require(path.join(this.LIB_PATH, 'events.js'))(this);
 		require(path.join(this.LIB_PATH, 'data.js'))(this);
+		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
 
 		this.gpio.initialize();
 		this.data.initialize();
 		this.server.initialize();
-
-		this.events.registerErrorHandler();
-		this.events.registerExitEvents();
-	},
-
-	events: {
-		exit: ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK', 'PROCERR'],
-		doorOpen: function(){
-			if (!GarageDoor.gpio.doorIsClosed)
-				return;
-			else
-				GarageDoor.gpio.doorIsClosed = false;
-
-			GarageDoor.sockets.io.emit('dooropen');
-			var date = moment().format('h:mm:ss a');
-			console.log(`[${date}] Door open`);
-			GarageDoor.data.logDoorOpen(true);
-		},
-		doorClose: function(){
-			if (GarageDoor.gpio.doorIsClosed)
-				return;
-			else
-				GarageDoor.gpio.doorIsClosed = true;
-
-			GarageDoor.sockets.io.emit('doorclose');
-			var date = moment().format('h:mm:ss a');
-			console.log(`[${date}] Door closed`);
-			GarageDoor.data.logDoorClose(false);
-		},
-		processExit: function(event){
-			if (!!GarageDoor.GPIO_IS_INITIALIZED){
-				console.log(`\n${event} received.  Freeing resources...`);
-				GarageDoor.data.dispose();
-				GarageDoor.gpio.middleware.destroy(() => {
-					process.exit();
-				});
-			}
-		},
-		registerErrorHandler: () => {
-			process.on('uncaughtException', (err) => {
-				GarageDoor.data.logError(err);
-				console.log(`ERROR -> ${err.message}`);
-				console.log(err.stack);
-
-				if (GarageDoor.isDev)
-					process.emit('PROCERR');
-			});
-		},
-		registerExitEvents: function(){
-			var self = this;
-			_.each(this.exit, (event) => {
-				process.on(event, () => {
-					self.processExit(event);
-				});
-			});
-		}
+		this.events.initialize();
 	},
 
 	config: {
