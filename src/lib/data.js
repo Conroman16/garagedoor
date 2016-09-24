@@ -1,6 +1,10 @@
-var sqlite = require('sqlite3').verbose();
+var sqlite = require('sqlite3');
 
 module.exports = (GarageDoor, _, fs) => {
+
+	// Enable sqlite3's verbose mode if we're in dev mode
+	if (GarageDoor.isDev)
+		sqlite = sqlite.verbose();
 
 	GarageDoor.data = {
 		queries: {
