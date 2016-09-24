@@ -10,6 +10,9 @@ letsencrypt
 # Database
 data.db
 
+# Backups
+*.bak
+
 # macOS filesystem metadata
 ._.DS_Store
 .DS_Store
