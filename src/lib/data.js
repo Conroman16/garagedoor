@@ -9,31 +9,36 @@ module.exports = (GarageDoor) => {
 			create: { // These should be 'IF NOT EXISTS' statements because they are executed on every application start
 				eventLog: 'CREATE TABLE IF NOT EXISTS EventLog (ID INTEGER PRIMARY KEY, timestamp DATE, event TEXT, event_data TEXT)',
 				doorLog: 'CREATE TABLE IF NOT EXISTS DoorLog (ID INTEGER PRIMARY KEY, timestamp DATE, is_open BLOB)',
-				errorLog: 'CREATE TABLE IF NOT EXISTS ErrorLog (ID INTEGER PRIMARY KEY, timestamp DATE, error_message TEXT, stack_trace TEXT)'
+				errorLog: 'CREATE TABLE IF NOT EXISTS ErrorLog (ID INTEGER PRIMARY KEY, timestamp DATE, error_message TEXT, stack_trace TEXT)',
+				guestCodes: 'CREATE TABLE IF NOT EXISTS GuestCodes (ID INTEGER PRIMARY KEY, code INTEGER, created DATE)'
 			},
 			insert: {
 				eventLog: 'INSERT INTO EventLog (timestamp, event, event_data) VALUES (?, ?, ?)',
 				doorLog: 'INSERT INTO DoorLog (timestamp, is_open) VALUES (?, ?)',
-				errorLog: 'INSERT INTO ErrorLog (timestamp, error_message, stack_trace) VALUES (?, ?, ?)'
+				errorLog: 'INSERT INTO ErrorLog (timestamp, error_message, stack_trace) VALUES (?, ?, ?)',
+				guestCode: 'INSERT INTO GuestCodes (code, created) VALUES (?, ?, ?)'
 			},
 			select: {
 				allEvents: 'SELECT * FROM EventLog',
 				allToggleDoorStateEvents: 'SELECT * FROM EventLog WHERE event = \'ToggleDoorState\'',
 				allSessionEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%session%\'',
 				allSocketEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%socket%\'',
-				userByDoorCode: 'SELECT * FROM Users WHERE door_code = \'?\''
+				userByDoorCode: 'SELECT * FROM Users WHERE door_code = \'?\'',
+				guestCode: 'SELECT * FROM GuestCodes WHERE code = \'?\''
 			}
 		},
 
 		initialize: () => {
-			var dbExists = fs.existsSync(GarageDoor.DB_FILE);
-			if (!dbExists){
-				console.log('Creating database...');
-				fs.openSync(GarageDoor.DB_FILE, 'w');
-			}
+			fs.stat(GarageDoor.DB_FILE, (err, stats) => {
+				if (err && err.errno === 34){  // 34 = 'not exists'
+					console.log('Creating database...');
+					fs.openSync(GarageDoor.DB_FILE, 'w');
+				}
+				else if (err) throw err;
 
-			GarageDoor.data.db = new sqlite.Database(GarageDoor.DB_FILE);
-			GarageDoor.data.createTables();
+				GarageDoor.data.db = new sqlite.Database(GarageDoor.DB_FILE);
+				GarageDoor.data.createTables();
+			});
 		},
 
 		dispose: () => {
@@ -119,12 +124,12 @@ module.exports = (GarageDoor) => {
 			});
 		},
 
-		logDoorOpen: () => {
-			GarageDoor.data.logDoorStateChange(true);
+		logDoorOpen: (session) => {
+			GarageDoor.data.logDoorStateChange(true, session);
 		},
 
-		logDoorClose: () => {
-			GarageDoor.data.logDoorStateChange(false);
+		logDoorClose: (session) => {
+			GarageDoor.data.logDoorStateChange(false, session);
 		},
 
 		logError: (err) => {
