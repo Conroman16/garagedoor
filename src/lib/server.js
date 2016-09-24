@@ -5,10 +5,9 @@ var socket = require('socket.io'),
 	ssl = require('letsencrypt-express'),
 	spdy = require('spdy'),
 	http = require('http'),
-	crypto = require('crypto'),
-	_ = require('underscore');
+	crypto = require('crypto');
 
-module.exports = function(GarageDoor, path){
+module.exports = function(GarageDoor, _, path){
 
 	// AUTHENTICATION
 	GarageDoor.auth = {

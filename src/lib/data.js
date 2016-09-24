@@ -1,8 +1,7 @@
-var _ = require('underscore'),
-	fs = require('fs'),
+var fs = require('fs'),
 	sqlite = require('sqlite3').verbose();
 
-module.exports = (GarageDoor) => {
+module.exports = (GarageDoor, _) => {
 
 	GarageDoor.data = {
 		queries: {

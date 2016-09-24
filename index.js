@@ -1,5 +1,6 @@
 var fs = require('fs'),
 	path = require('path'),
+	_ = require('underscore'),
 	dashArgs = [],
 	isDev = false;
 
@@ -38,9 +39,9 @@ var GarageDoor = {
 		this.config.read();
 
 		require(path.join(this.LIB_PATH, 'gpio.js'))(this);
-		require(path.join(this.LIB_PATH, 'events.js'))(this);
-		require(path.join(this.LIB_PATH, 'data.js'))(this);
-		require(path.join(this.LIB_PATH, 'server.js'))(this, path);
+		require(path.join(this.LIB_PATH, 'events.js'))(this, _);
+		require(path.join(this.LIB_PATH, 'data.js'))(this, _);
+		require(path.join(this.LIB_PATH, 'server.js'))(this, _, path);
 
 		this.gpio.initialize();
 		this.data.initialize();

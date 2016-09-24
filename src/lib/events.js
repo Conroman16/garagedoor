@@ -1,6 +1,4 @@
-var _ = require('underscore');
-
-module.exports = function(GarageDoor){
+module.exports = function(GarageDoor, _){
 
 	GarageDoor.events = {
 		exit: ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK', 'PROCERR'],
