@@ -53,7 +53,7 @@ module.exports = function(GarageDoor){
 					gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 0, function(err){
 						if (err) throw err;
 
-						console.log('Door state toggled successfully');
+						console.log('Door state toggled');
 					});
 				}, 500);
 			});

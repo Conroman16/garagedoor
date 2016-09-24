@@ -31,7 +31,7 @@
 							<div class="keypad-key">9</div>
 						</div>
 						<div class="keypad-row">
-							<div class="keypad-key"></div>
+							<div class="keypad-key">#</div>
 							<div class="keypad-key">0</div>
 							<div class="keypad-key backspace-key">
 								<i class="fa fa-angle-left"></i>

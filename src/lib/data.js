@@ -12,13 +12,13 @@ module.exports = (GarageDoor, _, fs) => {
 				eventLog: 'CREATE TABLE IF NOT EXISTS EventLog (ID INTEGER PRIMARY KEY, timestamp DATE, event TEXT, event_data TEXT)',
 				doorLog: 'CREATE TABLE IF NOT EXISTS DoorLog (ID INTEGER PRIMARY KEY, timestamp DATE, is_open BLOB)',
 				errorLog: 'CREATE TABLE IF NOT EXISTS ErrorLog (ID INTEGER PRIMARY KEY, timestamp DATE, error_message TEXT, stack_trace TEXT)',
-				guestCodes: 'CREATE TABLE IF NOT EXISTS GuestCodes (ID INTEGER PRIMARY KEY, code INTEGER, created DATE)'
+				guestCodes: 'CREATE TABLE IF NOT EXISTS GuestCodes (ID INTEGER PRIMARY KEY, code INTEGER, created DATE, inactive BLOB)'
 			},
 			insert: {
 				eventLog: 'INSERT INTO EventLog (timestamp, event, event_data) VALUES (?, ?, ?)',
 				doorLog: 'INSERT INTO DoorLog (timestamp, is_open) VALUES (?, ?)',
 				errorLog: 'INSERT INTO ErrorLog (timestamp, error_message, stack_trace) VALUES (?, ?, ?)',
-				guestCode: 'INSERT INTO GuestCodes (code, created) VALUES (?, ?, ?)'
+				guestCode: 'INSERT INTO GuestCodes (code, created, inactive) VALUES (?, ?, ?)'
 			},
 			select: {
 				allEvents: 'SELECT * FROM EventLog',
@@ -26,7 +26,7 @@ module.exports = (GarageDoor, _, fs) => {
 				allSessionEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%session%\'',
 				allSocketEvents: 'SELECT * FROM EventLog WHERE event LIKE \'%socket%\'',
 				userByDoorCode: 'SELECT * FROM Users WHERE door_code = \'?\'',
-				guestCode: 'SELECT * FROM GuestCodes WHERE code = \'?\''
+				guestCode: 'SELECT * FROM GuestCodes WHERE code = \'{{code}}\''
 			}
 		},
 
@@ -150,8 +150,8 @@ module.exports = (GarageDoor, _, fs) => {
 				GarageDoor.data.db.all(GarageDoor.data.queries.select.allEvents, (err, rows) => {
 					if (err)
 						reject(err);
-
-					resolve(rows);
+					else
+						resolve(rows);
 				});
 			});
 		},
@@ -161,8 +161,8 @@ module.exports = (GarageDoor, _, fs) => {
 				GarageDoor.data.db.all(GarageDoor.data.queries.select.allSocketEvents, (err, rows) => {
 					if (err)
 						reject(err);
-
-					resolve(rows);
+					else
+						resolve(rows);
 				});
 			});
 		},
@@ -172,8 +172,8 @@ module.exports = (GarageDoor, _, fs) => {
 				GarageDoor.data.db.all(GarageDoor.data.queries.select.allToggleDoorStateEvents, (err, rows) => {
 					if (err)
 						reject(err);
-
-					resolve(rows);
+					else
+						resolve(rows);
 				});
 			});
 		},
@@ -183,8 +183,20 @@ module.exports = (GarageDoor, _, fs) => {
 				GarageDoor.data.db.all(GarageDoor.data.queries.select.allSessionEvents, (err, rows) => {
 					if (err)
 						reject(err);
+					else
+						resolve(rows);
+				});
+			});
+		},
 
-					resolve(rows);
+		getGuestPermission: (code) => {
+			return new Promise((resolve, reject) => {
+				var query = GarageDoor.data.queries.select.guestCode.replace('{{code}}', code);
+				GarageDoor.data.db.get(query, (err, row) => {
+					if (err)
+						reject(err);
+					else
+						resolve(row);
 				});
 			});
 		}

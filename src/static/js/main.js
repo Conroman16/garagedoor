@@ -107,10 +107,14 @@ $(function(){
 
 				GarageDoor.view.$pinInput.on('keyup', function(){
 					var $this = $(this),
-						value = GarageDoor.view.$pinValue.val();
+						value = GarageDoor.view.$pinValue.val(),
+						isGuestCode = value[0] === '#';
+
+					if (isGuestCode)
+						value = value.replace(/#/g, '');
 
 					if (value.length === GarageDoor.view.maxPinLength)
-						GarageDoor.view.validatePin(value);
+						GarageDoor.view.validatePin(value, isGuestCode);
 					else
 						$this.removeClass('valid invalid');
 				});
@@ -120,7 +124,7 @@ $(function(){
 						value = $this.text(),
 						pin = GarageDoor.view.$pinValue.val();
 
-					if (pin.length == GarageDoor.view.maxPinLength)
+					if (pin.replace(/#/g, '').length == GarageDoor.view.maxPinLength)
 						return;
 					else
 						pin += value;
@@ -194,10 +198,11 @@ $(function(){
 				GarageDoor.view.$pinValue.val(pin);
 			},
 
-			validatePin(pin){
+			validatePin(pin, isGuestCode){
 				GarageDoor.socket.emit('doorauth', {
 					pin: pin,
-					fingerprint: window.fingerprint
+					fingerprint: window.fingerprint,
+					isGuestCode: isGuestCode
 				});
 			},
 

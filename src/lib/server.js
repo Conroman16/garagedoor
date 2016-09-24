@@ -68,29 +68,40 @@ module.exports = function(GarageDoor, _, path){
 				});
 
 				socket.on('doorauth', (data) => {
+					var isGuestCode = data.isGuestCode || false;
 					var ret = {
 						error: true,
 						success: false
 					};
-					if (!data || !data.fingerprint || !data.pin)
-						socket.emit('doorauthreply', ret);
 
-					if (data.pin == GarageDoor.config.doorcode){
+					function approveAuthRequest(){
 						GarageDoor.auth.generateToken((token) => {
-							if (!token)
+							if (!token){
 								socket.emit('doorauthreply', ret);
-
+								return;
+							}
 							GarageDoor.auth.newSession(token, data.fingerprint);
-
-							socket.emit('doorauthreply', Object.assign(ret, {
+							socket.emit('doorauthreply', _.extend(ret, {
 								error: false,
 								success: true,
 								token: token
 							}));
 						});
 					}
+
+					if (!data || !data.fingerprint || !data.pin)
+						socket.emit('doorauthreply', ret);
+
+					if (isGuestCode){
+						GarageDoor.data.getGuestPermission(data.pin).then((guest) => {
+							if (guest && !guest.inactive)
+								approveAuthRequest();
+						});
+					}
+					else if (data.pin == GarageDoor.config.doorcode)
+						approveAuthRequest();
 					else
-						socket.emit('doorauthreply', Object.assign(ret, {error: false}));
+						socket.emit('doorauthreply', _.extend(ret, {error: false}));
 				});
 			});
 		}
@@ -114,7 +125,7 @@ module.exports = function(GarageDoor, _, path){
 					if (certs)
 						opts.domains = certs.altnames;
 					else{
-						Object.assign(opts, {
+						_.extend(opts, {
 							agreeTos: true,
 							email: GarageDoor.config.ssl.email,
 							domains: GarageDoor.config.ssl.domains
@@ -157,7 +168,7 @@ module.exports = function(GarageDoor, _, path){
 				});
 			});
 
-			app.get('/license', function(req, res){
+			app.get(/\/license(\.txt)?/i, function(req, res){
 				res.sendFile(path.join(GarageDoor.BASE_PATH, 'LICENSE'), {
 					headers: {
 						'Content-Type': 'text/plain'
