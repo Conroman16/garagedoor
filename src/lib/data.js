@@ -15,6 +15,7 @@ module.exports = (GarageDoor) => {
 				eventLog: 'INSERT INTO EventLog (timestamp, event, event_data) VALUES (?, ?, ?)',
 				doorLog: 'INSERT INTO DoorLog (timestamp, is_open) VALUES (?, ?)',
 				errorLog: 'INSERT INTO ErrorLog (timestamp, error_message, stack_trace) VALUES (?, ?, ?)'
+			},
 			select: {
 				allEvents: 'SELECT * FROM EventLog',
 				allToggleDoorStateEvents: 'SELECT * FROM EventLog WHERE event = \'ToggleDoorState\'',
@@ -26,7 +27,7 @@ module.exports = (GarageDoor) => {
 
 		initialize: () => {
 			var dbExists = fs.existsSync(GarageDoor.DB_FILE);
-			if(!dbExists){
+			if (!dbExists){
 				console.log('Creating database...');
 				fs.openSync(GarageDoor.DB_FILE, 'w');
 			}
