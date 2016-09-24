@@ -35,10 +35,7 @@ module.exports = function(GarageDoor){
 		doorIsOpen: function(callback){
 			var self = this;
 			gpio.read(GarageDoor.POSITION_SENSOR_GPIO_PIN, function(err, value){
-				if (err){
-					console.log(`ERROR: ${err}`);
-					throw err;
-				}
+				if (err) throw err;
 
 				self.doorIsOpen = value;
 				if (!!callback)
@@ -46,19 +43,15 @@ module.exports = function(GarageDoor){
 			});
 		},
 		toggleDoor: function(){
-			gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 1, function(err){
-				if (err){
-					console.log('ERROR: ' + err);
-					throw err;
-				}
 
-				console.log('Toggling door state');
+			// Close the circuit, causing the door to begin moving
+			gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 1, function(err){
+				if (err) throw err;
+
+				// Wait 500ms and open the circuit again (simulates a door button press)
 				setTimeout(function(){
 					gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 0, function(err){
-						if (err){
-							console.log('ERROR: ' + err);
-							throw err;
-						}
+						if (err) throw err;
 
 						console.log('Door state toggled successfully');
 					});
