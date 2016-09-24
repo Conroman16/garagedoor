@@ -16,7 +16,10 @@ for (var i = 0; i < process.argv.length; i++){
 if (dashArgs.indexOf('dev') >= 0){
 	isDev = true;
 	console.log('DEV MODE');
+	process.env.NODE_ENV = 'development';
 }
+else
+	process.env.NODE_ENV = 'production';
 
 var GarageDoor = {
 
