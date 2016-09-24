@@ -1,7 +1,6 @@
-var fs = require('fs'),
-	sqlite = require('sqlite3').verbose();
+var sqlite = require('sqlite3').verbose();
 
-module.exports = (GarageDoor, _) => {
+module.exports = (GarageDoor, _, fs) => {
 
 	GarageDoor.data = {
 		queries: {
