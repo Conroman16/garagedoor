@@ -8,7 +8,7 @@ src/static/css/**
 letsencrypt
 
 # Database
-data.db
+*.db
 
 # Backups
 *.bak
