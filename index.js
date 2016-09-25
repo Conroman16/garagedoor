@@ -12,7 +12,7 @@ for (var i = 0; i < process.argv.length; i++){
 	}
 }
 
-if (dashArgs.indexOf('dev') >= 0){
+if (dashArgs.indexOf('dev') >= 0 || process.env.NODE_ENV === 'development'){
 	console.log('DEV MODE');
 	isDev = true;
 	process.env.NODE_ENV = 'development';

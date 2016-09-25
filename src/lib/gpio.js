@@ -48,14 +48,14 @@ module.exports = function(GarageDoor){
 			gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 1, function(err){
 				if (err) throw err;
 
-				// Wait 500ms and open the circuit again (simulates a door button press)
+				// Wait the length of time specified in 'GarageDoor.DOOR_TOGGLE_TIME' and open the circuit again (simulates a button press)
 				setTimeout(function(){
 					gpio.write(GarageDoor.OPENER_RELAY_GPIO_PIN, 0, function(err){
 						if (err) throw err;
 
 						console.log('Door state toggled');
 					});
-				}, 500);
+				}, GarageDoor.DOOR_TOGGLE_TIME);
 			});
 		}
 	};
