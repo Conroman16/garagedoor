@@ -9,7 +9,7 @@ for (var i = 0; i < process.argv.length; i++){
 	}
 }
 
-if (dashArgs.indexOf('dev') >= 0 || process.env.NODE_ENV.indexOf('dev') >= 0){
+if (dashArgs.indexOf('dev') >= 0 || (process.env.NODE_ENV || '').indexOf('dev') >= 0){
 	console.log('DEV MODE');
 	isDev = true;
 	process.env.NODE_ENV = 'development';
@@ -20,7 +20,7 @@ else
 var fs = require('fs'),
 	path = require('path'),
 	_ = require('underscore'),
-	models = require('./models');
+	models = require('./data/models');
 
 var GarageDoor = {
 
