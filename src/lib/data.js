@@ -4,14 +4,6 @@ module.exports = (GarageDoor, _, fs) => {
 
 	GarageDoor.data = {
 
-		createTables: () => {
-			GarageDoor.data.db.serialize(() => {
-				_.each(GarageDoor.data.queries.create, (query) => {
-					GarageDoor.data.db.run(query);
-				});
-			});
-		},
-
 		// Uses e.event, e.data
 		logNewEvent: (e) => {
 			if (!e || !e.event)
