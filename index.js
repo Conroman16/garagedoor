@@ -28,10 +28,11 @@ var GarageDoor = {
 	OPENER_RELAY_GPIO_PIN: 29,		// Physical pin number
 	DOOR_TOGGLE_TIME: 500, 			// Milliseconds
 	BASE_PATH: __dirname,
-	VIEWS_PATH: path.join(__dirname, 'views'),
-	STATIC_FILES_PATH: path.join(__dirname, 'static'),
+	CONFIG_FILE_PATH: path.join(__dirname, '.config'),
 	LIB_PATH: path.join(__dirname, 'lib'),
-	SSL_DATA_PATH: path.join(__dirname, 'letsencrypt'),
+	VIEWS_PATH: path.join(__dirname, 'web', 'views'),
+	STATIC_FILES_PATH: path.join(__dirname, 'web', 'static'),
+	SSL_DATA_PATH: path.join(__dirname, 'web', 'letsencrypt'),
 	GPIO_IS_INITIALIZED: false,
 	arguments: dashArgs,
 	isDev: isDev,
@@ -53,7 +54,7 @@ var GarageDoor = {
 
 	config: {
 		read: () => {
-			var fileContents = fs.readFileSync(path.join(__dirname, '.config'), 'utf8');
+			var fileContents = fs.readFileSync(GarageDoor.CONFIG_FILE_PATH, 'utf8');
 			var config = JSON.parse(fileContents);
 			_.extend(GarageDoor.config, config);
 		}
