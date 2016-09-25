@@ -1,8 +1,4 @@
-var fs = require('fs'),
-	path = require('path'),
-	_ = require('underscore'),
-	models = require('./models'),
-	dashArgs = [],
+var dashArgs = [],
 	isDev = false;
 
 for (var i = 0; i < process.argv.length; i++){
@@ -20,6 +16,11 @@ if (dashArgs.indexOf('dev') >= 0 || process.env.NODE_ENV === 'development'){
 }
 else
 	process.env.NODE_ENV = 'production';
+
+var fs = require('fs'),
+	path = require('path'),
+	_ = require('underscore'),
+	models = require('./models');
 
 var GarageDoor = {
 
@@ -55,7 +56,7 @@ var GarageDoor = {
 		read: () => {
 			var fileContents = fs.readFileSync(path.join(__dirname, '.config'), 'utf8');
 			var config = JSON.parse(fileContents);
-			Object.assign(GarageDoor.config, config);
+			_.extend(GarageDoor.config, config);
 		}
 	}
 };
