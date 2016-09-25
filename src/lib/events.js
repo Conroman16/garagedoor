@@ -30,7 +30,6 @@ module.exports = function(GarageDoor, _){
 		processExit: function(event){
 			if (GarageDoor.GPIO_IS_INITIALIZED){
 				console.log(`\n${event} received.  Freeing resources...`);
-				GarageDoor.data.dispose();
 				GarageDoor.gpio.middleware.destroy(() => {
 					process.exit();
 				});

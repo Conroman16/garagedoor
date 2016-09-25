@@ -1,6 +1,7 @@
 var fs = require('fs'),
 	path = require('path'),
 	_ = require('underscore'),
+	models = require('./models'),
 	dashArgs = [],
 	isDev = false;
 
@@ -43,10 +44,11 @@ var GarageDoor = {
 		require(path.join(this.LIB_PATH, 'data.js'))(this, _, fs);
 		require(path.join(this.LIB_PATH, 'server.js'))(this, _, path);
 
-		this.gpio.initialize();
-		this.data.initialize();
-		this.server.initialize();
-		this.events.initialize();
+		models.sequelize.sync().then(() => {
+			this.gpio.initialize();
+			this.server.initialize();
+			this.events.initialize();
+		});
 	},
 
 	config: {
