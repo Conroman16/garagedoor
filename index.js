@@ -28,12 +28,11 @@ var GarageDoor = {
 	OPENER_RELAY_GPIO_PIN: 29,		// Physical pin number
 	DOOR_TOGGLE_TIME: 500, 			// Milliseconds
 	BASE_PATH: __dirname,
-	VIEWS_PATH: path.join(__dirname, 'src', 'views'),
-	STATIC_FILES_PATH: path.join(__dirname, 'src', 'static'),
-	LIB_PATH: path.join(__dirname, 'src', 'lib'),
+	VIEWS_PATH: path.join(__dirname, 'views'),
+	STATIC_FILES_PATH: path.join(__dirname, 'static'),
+	LIB_PATH: path.join(__dirname, 'lib'),
 	SSL_DATA_PATH: path.join(__dirname, 'letsencrypt'),
 	GPIO_IS_INITIALIZED: false,
-	DB_FILE: path.join(__dirname, 'data.db'),
 	arguments: dashArgs,
 	isDev: isDev,
 
