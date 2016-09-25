@@ -89,65 +89,12 @@ module.exports = (GarageDoor, _, fs) => {
 			});
 		},
 
-		// getAllEvents: () => {
-		// 	return new Promise((resolve, reject) => {
-		// 		GarageDoor.data.db.all(GarageDoor.data.queries.select.allEvents, (err, rows) => {
-		// 			if (err)
-		// 				reject(err);
-		// 			else
-		// 				resolve(rows);
-		// 		});
-		// 	});
-		// },
-
-		// getAllSocketEvents: () => {
-		// 	return new Promise((resolve, reject) => {
-		// 		GarageDoor.data.db.all(GarageDoor.data.queries.select.allSocketEvents, (err, rows) => {
-		// 			if (err)
-		// 				reject(err);
-		// 			else
-		// 				resolve(rows);
-		// 		});
-		// 	});
-		// },
-
-		// getAllToggleDoorStates: () => {
-		// 	return new Promise((resolve, reject) => {
-		// 		GarageDoor.data.db.all(GarageDoor.data.queries.select.allToggleDoorStateEvents, (err, rows) => {
-		// 			if (err)
-		// 				reject(err);
-		// 			else
-		// 				resolve(rows);
-		// 		});
-		// 	});
-		// },
-
-		// getAllSessionEvents: () => {
-		// 	return new Promise((resolve, reject) => {
-		// 		GarageDoor.data.db.all(GarageDoor.data.queries.select.allSessionEvents, (err, rows) => {
-		// 			if (err)
-		// 				reject(err);
-		// 			else
-		// 				resolve(rows);
-		// 		});
-		// 	});
-		// },
-
 		getGuestPermission: (code) => {
 			return models.GuestPermission.findOne({
 				where: {
 					code: code
 				}
 			});
-			// return new Promise((resolve, reject) => {
-			// 	var query = GarageDoor.data.queries.select.guestCode.replace('{{code}}', code);
-			// 	GarageDoor.data.db.get(query, (err, row) => {
-			// 		if (err)
-			// 			reject(err);
-			// 		else
-			// 			resolve(row);
-			// 	});
-			// });
 		}
 	};
 }
