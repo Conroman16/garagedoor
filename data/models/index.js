@@ -1,18 +1,17 @@
 'use strict';
 
-var fs        = require('fs');
-var path      = require('path');
+var db = {};
+var fs = require('fs');
+var path = require('path');
 var Sequelize = require('sequelize');
-var basename  = path.basename(module.filename);
-var env       = process.env.NODE_ENV || 'development';
-var config    = require(__dirname + '/../config.json')[env];
-var db        = {};
+var basename = path.basename(module.filename);
+var config = require(path.join(__dirname, '/../config.json'))[process.env.NODE_ENV];
+// ^ NODE_ENV gets set in index.js before this script gets required so there's no need to check if it's undefined before use here
 
-if (config.use_env_variable) {
+if (config.use_env_variable)
 	var sequelize = new Sequelize(process.env[config.use_env_variable]);
-} else {
+else
 	var sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
 
 fs
 	.readdirSync(__dirname)
@@ -25,9 +24,8 @@ fs
 	});
 
 Object.keys(db).forEach(function(modelName) {
-	if (db[modelName].associate) {
+	if (db[modelName].associate)
 		db[modelName].associate(db);
-	}
 });
 
 db.sequelize = sequelize;

@@ -17,9 +17,9 @@ if (dashArgs.indexOf('dev') >= 0 || (process.env.NODE_ENV || '').indexOf('dev') 
 else
 	process.env.NODE_ENV = 'production';
 
-var fs = require('fs'),
+var _ = require('underscore'),
+	fs = require('fs'),
 	path = require('path'),
-	_ = require('underscore'),
 	models = require('./data/models');
 
 var GarageDoor = {
