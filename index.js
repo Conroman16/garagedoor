@@ -41,9 +41,9 @@ var GarageDoor = {
 		this.config.read();
 
 		require(path.join(this.LIB_PATH, 'gpio.js'))(this);
-		require(path.join(this.LIB_PATH, 'events.js'))(this, _);
-		require(path.join(this.LIB_PATH, 'data.js'))(this, _, fs);
-		require(path.join(this.LIB_PATH, 'server.js'))(this, _, path);
+		require(path.join(this.LIB_PATH, 'events.js'))(this);
+		require(path.join(this.LIB_PATH, 'data.js'))(this);
+		require(path.join(this.LIB_PATH, 'server.js'))(this);
 
 		models.sequelize.sync().then(() => {
 			this.gpio.initialize();
