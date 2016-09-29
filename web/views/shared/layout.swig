@@ -21,7 +21,6 @@
 			server: {
 				doorIsOpen: {{DoorIsOpen}},
 				wundergroundApiKey: '{{WundergroundApiKey}}',
-				pinLength: {{PinLength}},
 				location: {
 					city: '{{Location.city}}',
 					state: '{{Location.state}}'

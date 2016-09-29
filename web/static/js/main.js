@@ -101,8 +101,7 @@ $(function(){
 				GarageDoor.view.$doorToggle.click(function(){
 					GarageDoor.toggleState($(this).data('token'));
 				});
-				GarageDoor.view.maxPinLength = GarageDoor.server.pinLength;
-				GarageDoor.view.$pinInput.attr('maxlength', GarageDoor.server.pinLength);
+				GarageDoor.view.maxPinLength = parseInt(GarageDoor.view.$pinInput.attr('maxlength'));
 				GarageDoor.view.setPin('');
 
 				GarageDoor.view.$pinInput.on('keyup', function(){

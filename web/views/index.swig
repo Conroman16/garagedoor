@@ -11,7 +11,7 @@
 				</div>
 				<div class="auth-wrap">
 					<div class="pin">
-						<input type="text" class="pin-input input" maxlength="6"></input>
+					<input type="text" class="pin-input input" maxlength="{{PinLength}}"></input>
 						<input type="text" class="pin-val hide"></input>
 					</div>
 					<div class="keypad">
